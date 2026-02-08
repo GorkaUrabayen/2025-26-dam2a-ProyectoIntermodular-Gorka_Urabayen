@@ -27,7 +27,6 @@ public class GenerarMapa : MonoBehaviour
     public int[,] mapa;
     public List<Vector3> waypoints;
 
-    // Evento para avisar que el mapa está listo
     public event System.Action OnMapaGenerado;
 
     void Start()
@@ -48,19 +47,16 @@ public class GenerarMapa : MonoBehaviour
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
 
-                // Esquinas
                 if (x == 0 && y == 0) tilemap.SetTile(pos, esquinaAbajoIzquierda);
                 else if (x == 0 && y == altoMapa - 1) tilemap.SetTile(pos, esquinaArribaIzquierda);
                 else if (x == anchoMapa - 1 && y == 0) tilemap.SetTile(pos, esquinaAbajoDerecha);
                 else if (x == anchoMapa - 1 && y == altoMapa - 1) tilemap.SetTile(pos, esquinaArribaDerecha);
 
-                // Bordes
                 else if (y == altoMapa - 1) tilemap.SetTile(pos, bordeArriba);
                 else if (y == 0) tilemap.SetTile(pos, bordeAbajo);
                 else if (x == 0) tilemap.SetTile(pos, bordeIzquierda);
                 else if (x == anchoMapa - 1) tilemap.SetTile(pos, bordeDerecha);
 
-                // Suelo
                 else
                 {
                     tilemap.SetTile(pos, sueloTile);
@@ -68,11 +64,11 @@ public class GenerarMapa : MonoBehaviour
                 }
 
                 if (x == 0 || y == 0 || x == anchoMapa - 1 || y == altoMapa - 1)
-                    mapa[x, y] = 2; // borde
+                    mapa[x, y] = 2;
             }
         }
 
-        // Generar camino
+        // Generar camino aleatorio
         Vector2Int inicio = new Vector2Int(1, Random.Range(1, altoMapa - 1));
         Vector2Int fin = new Vector2Int(anchoMapa - 2, Random.Range(1, altoMapa - 1));
         List<Vector2Int> camino = GenerarCamino(inicio, fin, Random.Range(minZigZag, maxZigZag + 1));
@@ -81,7 +77,9 @@ public class GenerarMapa : MonoBehaviour
         {
             tilemap.SetTile(new Vector3Int(celda.x, celda.y, 0), caminoTile);
             mapa[celda.x, celda.y] = 1;
-            waypoints.Add(tilemap.CellToWorld(new Vector3Int(celda.x, celda.y, 0)) + new Vector3(0.5f, 0.5f, 0));
+
+            // Ajuste: z=-1 para que esté delante del Tilemap
+            waypoints.Add(tilemap.CellToWorld(new Vector3Int(celda.x, celda.y, 0)) + new Vector3(0.5f, 0.5f, -1f));
         }
     }
 

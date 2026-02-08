@@ -2,58 +2,63 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class Enemigo : MonoBehaviour
 {
+    [Header("Movimiento")]
     public float velocidad = 2f;
-    public List<Vector3> waypoints;
+    private List<Vector3> waypoints;
     private int indiceWaypoint = 0;
+    private bool listoParaMover = false;
+
+    [Header("Vida")]
     public int vida = 10;
+    private bool estaVivo = true;
 
     public delegate void LlegadaFinal();
     public event LlegadaFinal OnLlegadaFinal;
 
-    private bool listoParaMover = false;
+    [Header("Animaciones")]
+    public Animator animator;
 
-    void Start()
+    private Rigidbody2D rb;
+
+    void Awake()
     {
-        // Si ya tiene waypoints asignados, se activa inmediatamente
-        if (waypoints != null && waypoints.Count > 0)
-        {
-            PrepararMovimiento();
-        }
-        else
-        {
-            // Espera a que el spawner le asigne los waypoints
-            StartCoroutine(EsperarWaypoints());
-        }
-    }
-
-    // ⚠ Importante: usar IEnumerator de System.Collections, NO genérico
-    IEnumerator EsperarWaypoints()
-    {
-        // Esperamos hasta que waypoints tenga al menos un elemento
-        while (waypoints == null || waypoints.Count == 0)
-        {
-            yield return null;
-        }
-
-        PrepararMovimiento();
-    }
-
-    void PrepararMovimiento()
-    {
-        // Posicionar en el primer waypoint
-        transform.position = waypoints[0];
-        indiceWaypoint = 0;
-        listoParaMover = true;
+        rb = GetComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Kinematic; // Muy importante para mover manualmente
     }
 
     void Update()
     {
-        if (listoParaMover)
+        if (listoParaMover && estaVivo)
         {
             Mover();
         }
+    }
+
+    public void SetWaypoints(List<Vector3> puntos)
+    {
+        if (puntos == null || puntos.Count < 2)
+        {
+            Debug.LogWarning("Waypoints inválidos para enemigo");
+            return;
+        }
+
+        waypoints = new List<Vector3>(puntos);
+        indiceWaypoint = 0;
+
+        // Posicionar al enemigo en el primer waypoint
+        Vector3 inicio = waypoints[0];
+        inicio.z = 0; // importante para 2D
+        rb.position = inicio;
+
+        listoParaMover = true;
+
+        if (animator != null)
+            animator.SetBool("Caminando", true);
+
+        Debug.Log("Waypoints asignados. Listo para moverse!");
     }
 
     void Mover()
@@ -61,29 +66,51 @@ public class Enemigo : MonoBehaviour
         if (indiceWaypoint >= waypoints.Count) return;
 
         Vector3 objetivo = waypoints[indiceWaypoint];
-        transform.position = Vector3.MoveTowards(transform.position, objetivo, velocidad * Time.deltaTime);
+        objetivo.z = 0; // 2D
 
-        if (Vector3.Distance(transform.position, objetivo) < 0.01f)
+        // Mover usando Rigidbody2D
+        Vector2 nuevaPos = Vector2.MoveTowards(rb.position, (Vector2)objetivo, velocidad * Time.deltaTime);
+        rb.MovePosition(nuevaPos);
+
+        // Debug para verificar movimiento
+        Debug.Log($"Waypoint actual: {indiceWaypoint} | Pos: {rb.position} | Objetivo: {objetivo}");
+
+        // Comprobar llegada al waypoint
+        if (Vector2.Distance(rb.position, (Vector2)objetivo) < 0.1f)
         {
             indiceWaypoint++;
 
-            // Llegó al final
             if (indiceWaypoint >= waypoints.Count)
             {
+                listoParaMover = false;
                 OnLlegadaFinal?.Invoke();
-                Destroy(gameObject);
+                Morir();
             }
         }
     }
 
-    public virtual void RecibirDanio(int cantidad)
+    public void RecibirDanio(int cantidad)
     {
+        if (!estaVivo) return;
+
         vida -= cantidad;
-        if (vida <= 0) Morir();
+        if (animator != null) animator.SetTrigger("RecibirDanio");
+
+        if (vida <= 0)
+        {
+            Morir();
+        }
     }
 
-    public virtual void Morir()
+    public void Morir()
     {
-        Destroy(gameObject);
+        if (!estaVivo) return;
+
+        estaVivo = false;
+        listoParaMover = false;
+
+        if (animator != null) animator.SetTrigger("Morir");
+
+        Destroy(gameObject, 0.5f); // Espera animación de muerte
     }
 }

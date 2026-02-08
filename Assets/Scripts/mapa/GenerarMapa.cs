@@ -8,13 +8,11 @@ public class GenerarMapa : MonoBehaviour
     public TileBase caminoTile;
     public TileBase sueloTile;
 
-    // Borde
     public TileBase bordeArriba;
     public TileBase bordeAbajo;
     public TileBase bordeIzquierda;
     public TileBase bordeDerecha;
 
-    // Opcional: esquinas
     public TileBase esquinaArribaIzquierda;
     public TileBase esquinaArribaDerecha;
     public TileBase esquinaAbajoIzquierda;
@@ -29,9 +27,13 @@ public class GenerarMapa : MonoBehaviour
     public int[,] mapa;
     public List<Vector3> waypoints;
 
+    // Evento para avisar que el mapa está listo
+    public event System.Action OnMapaGenerado;
+
     void Start()
     {
         GenerarMapaCompleto();
+        OnMapaGenerado?.Invoke();
     }
 
     void GenerarMapaCompleto()
@@ -62,16 +64,15 @@ public class GenerarMapa : MonoBehaviour
                 else
                 {
                     tilemap.SetTile(pos, sueloTile);
-                    mapa[x, y] = 0; // suelo
+                    mapa[x, y] = 0;
                 }
 
-                // Marcar los bordes en la matriz
                 if (x == 0 || y == 0 || x == anchoMapa - 1 || y == altoMapa - 1)
                     mapa[x, y] = 2; // borde
             }
         }
 
-        // Generar camino como antes
+        // Generar camino
         Vector2Int inicio = new Vector2Int(1, Random.Range(1, altoMapa - 1));
         Vector2Int fin = new Vector2Int(anchoMapa - 2, Random.Range(1, altoMapa - 1));
         List<Vector2Int> camino = GenerarCamino(inicio, fin, Random.Range(minZigZag, maxZigZag + 1));
@@ -79,7 +80,7 @@ public class GenerarMapa : MonoBehaviour
         foreach (var celda in camino)
         {
             tilemap.SetTile(new Vector3Int(celda.x, celda.y, 0), caminoTile);
-            mapa[celda.x, celda.y] = 1; // camino
+            mapa[celda.x, celda.y] = 1;
             waypoints.Add(tilemap.CellToWorld(new Vector3Int(celda.x, celda.y, 0)) + new Vector3(0.5f, 0.5f, 0));
         }
     }
@@ -99,7 +100,6 @@ public class GenerarMapa : MonoBehaviour
             int targetX = inicio.x + segmento * (z + 1);
             int targetY = Random.Range(1, altoMapa - 1);
 
-            // Horizontal
             int stepX = targetX > actual.x ? 1 : -1;
             while (actual.x != targetX)
             {
@@ -107,7 +107,6 @@ public class GenerarMapa : MonoBehaviour
                 path.Add(new Vector2Int(actual.x, actual.y));
             }
 
-            // Vertical
             int stepY = targetY > actual.y ? 1 : -1;
             while (actual.y != targetY)
             {
@@ -116,7 +115,6 @@ public class GenerarMapa : MonoBehaviour
             }
         }
 
-        // Último tramo hasta fin
         int stepXFin = fin.x > actual.x ? 1 : -1;
         while (actual.x != fin.x)
         {

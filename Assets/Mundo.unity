@@ -256,9 +256,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilemap: {fileID: 199372657}
-  caminoTile: {fileID: 11400000, guid: 73b6dcf8cffbb784abe8c87909dc4261, type: 2}
-  bordeTile: {fileID: 11400000, guid: 5a0e34e06c0acad48a66687b62476d9d, type: 2}
-  sueloTile: {fileID: 11400000, guid: c5417866f8b89c54e977f84c7b763af9, type: 2}
+  caminoTile: {fileID: 11400000, guid: 86155a5050f87194f9a92025509d3253, type: 2}
+  sueloTile: {fileID: 11400000, guid: c0f34553fcf092841a6eaf6741511f58, type: 2}
+  bordeArriba: {fileID: 11400000, guid: 83c2b5855cbd27044b4f64ec4de5d9e0, type: 2}
+  bordeAbajo: {fileID: 11400000, guid: e308fb6095b101343b07a761e697766f, type: 2}
+  bordeIzquierda: {fileID: 11400000, guid: 0fe548ac013c63b41aa60055f76dc06f, type: 2}
+  bordeDerecha: {fileID: 11400000, guid: bb36e8ad283dcb24b8637d6be539195d, type: 2}
+  esquinaArribaIzquierda: {fileID: 11400000, guid: f37b5269b972daa4b89cc304e6e03a03, type: 2}
+  esquinaArribaDerecha: {fileID: 11400000, guid: 7c8a6989f9e3d8b4c849145e5f73eaca, type: 2}
+  esquinaAbajoIzquierda: {fileID: 11400000, guid: 8f006b12fb3388c46a6e01733a2f10cf, type: 2}
+  esquinaAbajoDerecha: {fileID: 11400000, guid: e308fb6095b101343b07a761e697766f, type: 2}
   anchoMapa: 15
   altoMapa: 15
   minZigZag: 2
@@ -325,7 +332,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 20
+  orthographic size: 8.60799
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -350,7 +357,7 @@ Transform:
   m_GameObject: {fileID: 339590358}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 6.18, y: 8.64, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

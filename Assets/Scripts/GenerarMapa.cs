@@ -6,8 +6,19 @@ public class GenerarMapa : MonoBehaviour
 {
     public Tilemap tilemap;
     public TileBase caminoTile;
-    public TileBase bordeTile;
     public TileBase sueloTile;
+
+    // Borde
+    public TileBase bordeArriba;
+    public TileBase bordeAbajo;
+    public TileBase bordeIzquierda;
+    public TileBase bordeDerecha;
+
+    // Opcional: esquinas
+    public TileBase esquinaArribaIzquierda;
+    public TileBase esquinaArribaDerecha;
+    public TileBase esquinaAbajoIzquierda;
+    public TileBase esquinaAbajoDerecha;
 
     public int anchoMapa = 15;
     public int altoMapa = 15;
@@ -15,10 +26,7 @@ public class GenerarMapa : MonoBehaviour
     public int minZigZag = 2;
     public int maxZigZag = 3;
 
-    // Matriz del mapa
     public int[,] mapa;
-
-    // Lista de waypoints para los enemigos
     public List<Vector3> waypoints;
 
     void Start()
@@ -29,38 +37,45 @@ public class GenerarMapa : MonoBehaviour
     void GenerarMapaCompleto()
     {
         tilemap.ClearAllTiles();
-
         mapa = new int[anchoMapa, altoMapa];
         waypoints = new List<Vector3>();
 
-        // 1️⃣ Pintar bordes y suelo
         for (int x = 0; x < anchoMapa; x++)
         {
             for (int y = 0; y < altoMapa; y++)
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
 
-                if (x == 0 || y == 0 || x == anchoMapa - 1 || y == altoMapa - 1)
-                {
-                    tilemap.SetTile(pos, bordeTile);
-                    mapa[x, y] = 2; // borde
-                }
+                // Esquinas
+                if (x == 0 && y == 0) tilemap.SetTile(pos, esquinaAbajoIzquierda);
+                else if (x == 0 && y == altoMapa - 1) tilemap.SetTile(pos, esquinaArribaIzquierda);
+                else if (x == anchoMapa - 1 && y == 0) tilemap.SetTile(pos, esquinaAbajoDerecha);
+                else if (x == anchoMapa - 1 && y == altoMapa - 1) tilemap.SetTile(pos, esquinaArribaDerecha);
+
+                // Bordes
+                else if (y == altoMapa - 1) tilemap.SetTile(pos, bordeArriba);
+                else if (y == 0) tilemap.SetTile(pos, bordeAbajo);
+                else if (x == 0) tilemap.SetTile(pos, bordeIzquierda);
+                else if (x == anchoMapa - 1) tilemap.SetTile(pos, bordeDerecha);
+
+                // Suelo
                 else
                 {
                     tilemap.SetTile(pos, sueloTile);
                     mapa[x, y] = 0; // suelo
                 }
+
+                // Marcar los bordes en la matriz
+                if (x == 0 || y == 0 || x == anchoMapa - 1 || y == altoMapa - 1)
+                    mapa[x, y] = 2; // borde
             }
         }
 
-        // 2️⃣ Elegir inicio y fin del camino
+        // Generar camino como antes
         Vector2Int inicio = new Vector2Int(1, Random.Range(1, altoMapa - 1));
         Vector2Int fin = new Vector2Int(anchoMapa - 2, Random.Range(1, altoMapa - 1));
-
-        // 3️⃣ Generar camino
         List<Vector2Int> camino = GenerarCamino(inicio, fin, Random.Range(minZigZag, maxZigZag + 1));
 
-        // 4️⃣ Pintar camino y rellenar matriz / waypoints
         foreach (var celda in camino)
         {
             tilemap.SetTile(new Vector3Int(celda.x, celda.y, 0), caminoTile);
@@ -73,7 +88,6 @@ public class GenerarMapa : MonoBehaviour
     {
         List<Vector2Int> path = new List<Vector2Int>();
         path.Add(inicio);
-
         Vector2Int actual = inicio;
 
         int totalZig = zigzags;

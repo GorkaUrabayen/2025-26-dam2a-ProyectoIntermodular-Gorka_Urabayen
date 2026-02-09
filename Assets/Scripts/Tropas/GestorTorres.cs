@@ -44,38 +44,38 @@ public class GestorTorres : MonoBehaviour
 {
     if (torreTemporal == null) return;
 
-    // Convertir posición mundo a celda
     Vector3Int celda = generadorMapa.tilemap.WorldToCell(posicion);
 
     int x = celda.x;
     int y = celda.y;
 
-    // Fuera del mapa
     if (x < 0 || y < 0 || x >= generadorMapa.anchoMapa || y >= generadorMapa.altoMapa)
-    {
-        Debug.Log("Fuera del mapa");
         return;
-    }
 
     int valor = generadorMapa.mapa[x, y];
 
-    // 1 = camino
-    // 2 = borde
     if (valor == 1 || valor == 2)
     {
-        Debug.Log("NO puedes colocar torres aquí");
+        Debug.Log("No puedes colocar aquí");
+        return;
+    }
+
+    Torre torre = torreTemporal.GetComponent<Torre>();
+
+    // 💰 COMPROBAR DINERO
+    if (!GameManager.instancia.GastarDinero(torre.coste))
+    {
+        Debug.Log("No tienes dinero");
         return;
     }
 
     SetAlpha(torreTemporal, 1f);
 
-    Torre t = torreTemporal.GetComponent<Torre>();
-    if (t != null)
-        t.estaColocada = true;
-
+    torre.estaColocada = true;
     torreTemporal = null;
     modoColocacion = false;
 }
+
 
     void CancelarColocacion()
     {

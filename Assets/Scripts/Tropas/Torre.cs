@@ -8,7 +8,9 @@ public class Torre : MonoBehaviour
     public float cadencia = 1f;
     public int danio = 5;
 
-    public bool estaColocada = true;
+    public int coste = 20;
+public bool estaColocada = false;
+
 
     protected float tiempoUltimoDisparo = 0f;
     protected Enemigo objetivoActual;

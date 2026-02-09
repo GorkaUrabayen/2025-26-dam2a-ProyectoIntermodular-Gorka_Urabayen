@@ -86,6 +86,8 @@ public class Enemigo : MonoBehaviour
 
         if (vida <= 0)
             Morir();
+            GameManager.instancia.GanarDinero(5);
+
     }
 
     public void Morir()
@@ -98,6 +100,8 @@ public class Enemigo : MonoBehaviour
         if (animator != null)
             animator.SetTrigger("Morir");
 
-        Destroy(gameObject, 0.5f);
+        GameManager.instancia.PerderVida(1);
+        Destroy(gameObject);
+
     }
 }

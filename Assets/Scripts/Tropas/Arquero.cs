@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class Arquero : Torre
 {
+     protected void Awake()
+    {
+        alcance = 2f; // Por ejemplo, menos alcance que la torre base
+    }
     protected override void Atacar()
     {
         if (objetivoActual == null) return;

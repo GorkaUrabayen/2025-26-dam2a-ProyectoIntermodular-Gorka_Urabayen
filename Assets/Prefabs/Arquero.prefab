@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1384499602757975931}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.061, y: 0.16, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -61,8 +61,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6951866107963330049}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.235786, y: 5.737777, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.25712872, y: -0.8712244, z: 0.09199461}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -228,10 +228,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f7b130c70471dd439c9a4e92f64e780, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alcance: 5
-  cadencia: 1
   flechaPrefab: {fileID: 5104650842868696795, guid: 6db611888f0233340a2674f461db452f, type: 3}
   puntoDisparo: {fileID: 3459007012015553506}
+  alcance: 5
+  cadencia: 1
   danio: 10
   animator: {fileID: 532370109953220764}
 --- !u!61 &7466651341646539326

@@ -7,7 +7,7 @@ public class Enemigo : MonoBehaviour
 {
     [Header("Movimiento")]
     public float velocidad = 2f;
-    private List<Vector3> waypoints;
+    protected List<Vector3> waypoints;
     private int indiceWaypoint = 0;
     private bool listoParaMover = false;
 
@@ -21,65 +21,53 @@ public class Enemigo : MonoBehaviour
     [Header("Animaciones")]
     public Animator animator;
 
-    private Rigidbody2D rb;
+    protected Rigidbody2D rb;
 
-    void Awake()
+    // --- Awake protegido para poder sobrescribir en subclases ---
+    protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.bodyType = RigidbodyType2D.Kinematic; // Muy importante para mover manualmente
+        rb.bodyType = RigidbodyType2D.Kinematic;
     }
 
     void Update()
     {
         if (listoParaMover && estaVivo)
-        {
             Mover();
-        }
     }
 
     public void SetWaypoints(List<Vector3> puntos)
     {
         if (puntos == null || puntos.Count < 2)
-        {
-            Debug.LogWarning("Waypoints inválidos para enemigo");
             return;
-        }
 
         waypoints = new List<Vector3>(puntos);
         indiceWaypoint = 0;
 
-        // Posicionar al enemigo en el primer waypoint
         Vector3 inicio = waypoints[0];
-        inicio.z = 0; // importante para 2D
+        inicio.z = 0;
         rb.position = inicio;
 
         listoParaMover = true;
 
         if (animator != null)
             animator.SetBool("Caminando", true);
-
-        Debug.Log("Waypoints asignados. Listo para moverse!");
     }
 
-    void Mover()
+    // --- Mover está fuera de SetWaypoints ---
+    protected virtual void Mover()
     {
         if (indiceWaypoint >= waypoints.Count) return;
 
         Vector3 objetivo = waypoints[indiceWaypoint];
-        objetivo.z = 0; // 2D
+        objetivo.z = 0;
 
-        // Mover usando Rigidbody2D
         Vector2 nuevaPos = Vector2.MoveTowards(rb.position, (Vector2)objetivo, velocidad * Time.deltaTime);
         rb.MovePosition(nuevaPos);
 
-        // Debug para verificar movimiento
-        Debug.Log($"Waypoint actual: {indiceWaypoint} | Pos: {rb.position} | Objetivo: {objetivo}");
-
-        // Comprobar llegada al waypoint
         if (Vector2.Distance(rb.position, (Vector2)objetivo) < 0.1f)
         {
             indiceWaypoint++;
-
             if (indiceWaypoint >= waypoints.Count)
             {
                 listoParaMover = false;
@@ -97,9 +85,7 @@ public class Enemigo : MonoBehaviour
         if (animator != null) animator.SetTrigger("RecibirDanio");
 
         if (vida <= 0)
-        {
             Morir();
-        }
     }
 
     public void Morir()
@@ -109,8 +95,9 @@ public class Enemigo : MonoBehaviour
         estaVivo = false;
         listoParaMover = false;
 
-        if (animator != null) animator.SetTrigger("Morir");
+        if (animator != null)
+            animator.SetTrigger("Morir");
 
-        Destroy(gameObject, 0.5f); // Espera animación de muerte
+        Destroy(gameObject, 0.5f);
     }
 }

@@ -34,7 +34,7 @@ public class SpawnerOleadas : MonoBehaviour
         }
 
         waypoints = new List<Vector3>(mapaScript.waypoints);
-        Debug.Log("Waypoints cargados: " + waypoints.Count);
+        
 
         StartCoroutine(IniciarOleadas());
     }
@@ -50,7 +50,7 @@ public class SpawnerOleadas : MonoBehaviour
             }
 
             oleadaActual++;
-            Debug.Log("Oleada " + oleadaActual);
+           
 
             for (int i = 0; i < enemigosPorOleada; i++)
             {

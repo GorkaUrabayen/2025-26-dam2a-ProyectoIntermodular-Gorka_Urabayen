@@ -15,7 +15,8 @@ GameObject:
   - component: {fileID: 6151775081039457956}
   - component: {fileID: -1267441903133531204}
   - component: {fileID: -3107462834693543172}
-  - component: {fileID: 1014673706119151454}
+  - component: {fileID: 2076651552739303112}
+  - component: {fileID: 1410024272625821651}
   m_Layer: 0
   m_Name: Skull
   m_TagString: Untagged
@@ -257,7 +258,22 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
---- !u!114 &1014673706119151454
+--- !u!114 &2076651552739303112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4679007936719127254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3844cefc368f8c46af726c9254fb1ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  velocidad: 2
+  vida: 10
+  animator: {fileID: 0}
+--- !u!114 &1410024272625821651
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

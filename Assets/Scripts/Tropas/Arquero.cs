@@ -2,10 +2,11 @@ using UnityEngine;
 
 public class Arquero : Torre
 {
-     protected void Awake()
+    protected void Awake()
     {
-        alcance = 2f; // Por ejemplo, menos alcance que la torre base
+        alcance = 2f;
     }
+
     protected override void Atacar()
     {
         if (objetivoActual == null) return;
@@ -27,11 +28,11 @@ public class Arquero : Torre
                 animator.Play("Shoot Down");
         }
 
-        // Instanciar flecha
         if (flechaPrefab != null && puntoDisparo != null)
         {
             GameObject flecha = Instantiate(flechaPrefab, puntoDisparo.position, Quaternion.identity);
             Flecha f = flecha.GetComponent<Flecha>();
+
             if (f != null)
                 f.SetObjetivo(objetivoActual.transform, danio);
         }

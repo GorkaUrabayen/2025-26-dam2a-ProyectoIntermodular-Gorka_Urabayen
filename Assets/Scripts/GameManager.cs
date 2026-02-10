@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,12 +16,14 @@ public class GameManager : MonoBehaviour
 
     [Header("Cursor del Sistema")]
     public Texture2D cursorSprite;
-    public Vector2 hotSpot = Vector2.zero; 
+    public Vector2 hotSpot = Vector2.zero;
 
     void Awake()
     {
-        if (instancia == null) instancia = this;
-        else Destroy(gameObject);
+        if (instancia == null)
+            instancia = this;
+        else
+            Destroy(gameObject);
     }
 
     void Start()
@@ -33,7 +36,6 @@ public class GameManager : MonoBehaviour
     {
         if (cursorSprite != null)
         {
-            // CursorMode.Auto usa el hardware para evitar lag visual
             Cursor.SetCursor(cursorSprite, hotSpot, CursorMode.Auto);
         }
     }
@@ -41,8 +43,21 @@ public class GameManager : MonoBehaviour
     public void PerderVida(int cantidad)
     {
         vidas -= cantidad;
+
+        if (vidas < 0)
+            vidas = 0;
+
         ActualizarUI();
-        if (vidas <= 0) Debug.Log("Has perdido");
+
+        if (vidas <= 0)
+        {
+            CargarDerrota();
+        }
+    }
+
+    void CargarDerrota()
+    {
+        SceneManager.LoadScene("Derrota");
     }
 
     public void GanarDinero(int cantidad)
@@ -64,7 +79,10 @@ public class GameManager : MonoBehaviour
 
     void ActualizarUI()
     {
-        if (txtVidas != null) txtVidas.text = "Vidas: " + vidas;
-        if (txtDinero != null) txtDinero.text = "Dinero: " + dinero;
+        if (txtVidas != null)
+            txtVidas.text = "Vidas: " + vidas;
+
+        if (txtDinero != null)
+            txtDinero.text = "Dinero: " + dinero;
     }
 }

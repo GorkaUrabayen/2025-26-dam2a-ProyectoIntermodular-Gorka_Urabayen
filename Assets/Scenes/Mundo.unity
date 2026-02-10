@@ -255,7 +255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d4f2dd9acb094043912adc8fd1f7f8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vidas: 20
+  vidas: 1
   dinero: 30
   txtVidas: {fileID: 1174735708}
   txtDinero: {fileID: 430511178}

@@ -18,9 +18,6 @@ public class SpawnerOleadas : MonoBehaviour
     private int oleadaActual = 0;
     private bool pausado = false;
 
-    public delegate void EnemigoAlFinal();
-    public event EnemigoAlFinal OnEnemigoAlFinal;
-
     void Start()
     {
         StartCoroutine(IniciarSpawner());
@@ -34,7 +31,6 @@ public class SpawnerOleadas : MonoBehaviour
         }
 
         waypoints = new List<Vector3>(mapaScript.waypoints);
-        
 
         StartCoroutine(IniciarOleadas());
     }
@@ -50,7 +46,6 @@ public class SpawnerOleadas : MonoBehaviour
             }
 
             oleadaActual++;
-           
 
             for (int i = 0; i < enemigosPorOleada; i++)
             {
@@ -75,9 +70,7 @@ public class SpawnerOleadas : MonoBehaviour
                 prefab = prefabsExtra[index];
         }
 
-        Vector3 spawnPos = waypoints[0]; // ya tiene z=-1 desde mapa
-
-        GameObject nuevoEnemigo = Instantiate(prefab, spawnPos, Quaternion.identity);
+        GameObject nuevoEnemigo = Instantiate(prefab, waypoints[0], Quaternion.identity);
 
         Enemigo enemigoScript = nuevoEnemigo.GetComponent<Enemigo>();
         if (enemigoScript != null)
@@ -89,7 +82,8 @@ public class SpawnerOleadas : MonoBehaviour
 
     void EnemigoLlegadoAlFinal()
     {
-        OnEnemigoAlFinal?.Invoke();
+        if (GameManager.instancia != null)
+            GameManager.instancia.PerderVida(1);
     }
 
     public void Pausar() => pausado = true;

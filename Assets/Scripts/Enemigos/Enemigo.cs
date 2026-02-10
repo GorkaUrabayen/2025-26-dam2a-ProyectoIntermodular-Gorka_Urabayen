@@ -23,7 +23,6 @@ public class Enemigo : MonoBehaviour
 
     protected Rigidbody2D rb;
 
-    // --- Awake protegido para poder sobrescribir en subclases ---
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -54,43 +53,60 @@ public class Enemigo : MonoBehaviour
             animator.SetBool("Caminando", true);
     }
 
-    // --- Mover está fuera de SetWaypoints ---
-    protected virtual void Mover()
+   protected virtual void Mover()
+{
+    if (indiceWaypoint >= waypoints.Count) return;
+
+    Vector3 objetivo = waypoints[indiceWaypoint];
+    objetivo.z = 0;
+
+    float paso = velocidad * Time.deltaTime;
+
+    Vector2 direccion = (Vector2)objetivo - rb.position;
+    float distancia = direccion.magnitude;
+
+    // 👇 SI LLEGA AL PUNTO EXACTO
+    if (distancia <= paso)
     {
-        if (indiceWaypoint >= waypoints.Count) return;
+        rb.MovePosition(objetivo);
+        indiceWaypoint++;
 
-        Vector3 objetivo = waypoints[indiceWaypoint];
-        objetivo.z = 0;
-
-        Vector2 nuevaPos = Vector2.MoveTowards(rb.position, (Vector2)objetivo, velocidad * Time.deltaTime);
-        rb.MovePosition(nuevaPos);
-
-        if (Vector2.Distance(rb.position, (Vector2)objetivo) < 0.1f)
+        // 🏁 FINAL DEL CAMINO
+        if (indiceWaypoint >= waypoints.Count)
         {
-            indiceWaypoint++;
-            if (indiceWaypoint >= waypoints.Count)
-            {
-                listoParaMover = false;
-                OnLlegadaFinal?.Invoke();
-                Morir();
-            }
+            listoParaMover = false;
+
+            GameManager.instancia.PerderVida(1);
+            Morir(false);
+
+            return;
         }
     }
+    else
+    {
+        rb.MovePosition(rb.position + direccion.normalized * paso);
+    }
+}
+
 
     public void RecibirDanio(int cantidad)
     {
         if (!estaVivo) return;
 
         vida -= cantidad;
-        if (animator != null) animator.SetTrigger("RecibirDanio");
+
+        if (animator != null)
+            animator.SetTrigger("RecibirDanio");
 
         if (vida <= 0)
-            Morir();
+        {
+            // 💰 ganas dinero SOLO al matarlo
             GameManager.instancia.GanarDinero(5);
-
+            Morir(true);
+        }
     }
 
-    public void Morir()
+    public void Morir(bool muertoPorJugador)
     {
         if (!estaVivo) return;
 
@@ -100,8 +116,6 @@ public class Enemigo : MonoBehaviour
         if (animator != null)
             animator.SetTrigger("Morir");
 
-        GameManager.instancia.PerderVida(1);
         Destroy(gameObject);
-
     }
 }

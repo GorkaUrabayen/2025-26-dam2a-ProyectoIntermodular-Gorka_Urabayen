@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3459007012015553506}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PuntoDisparo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -46,9 +46,9 @@ GameObject:
   - component: {fileID: 630781903975605640}
   - component: {fileID: 5934809871180251601}
   - component: {fileID: 7466651341646539326}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Arquero
-  m_TagString: Untagged
+  m_TagString: Unidades
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -63,7 +63,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.25712872, y: -0.8712244, z: 0.09199461}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: -1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3459007012015553506}
@@ -109,7 +109,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_Sprite: {fileID: 758997784, guid: 62f1594083ed3a3498ae38980edb7ec4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -233,6 +233,8 @@ MonoBehaviour:
   alcance: 5
   cadencia: 1
   danio: 10
+  coste: 20
+  estaColocada: 0
   animator: {fileID: 532370109953220764}
 --- !u!61 &7466651341646539326
 BoxCollider2D:

@@ -4,7 +4,8 @@ public class Arquero : Torre
 {
     protected void Awake()
     {
-        alcance = 2f;
+        alcance = 2f; // Ejemplo: menos alcance que torre base
+        coste = 30;   // Ejemplo: el arquero cuesta 30 monedas
     }
 
     protected override void Atacar()
@@ -28,11 +29,11 @@ public class Arquero : Torre
                 animator.Play("Shoot Down");
         }
 
+        // Instanciar flecha
         if (flechaPrefab != null && puntoDisparo != null)
         {
             GameObject flecha = Instantiate(flechaPrefab, puntoDisparo.position, Quaternion.identity);
             Flecha f = flecha.GetComponent<Flecha>();
-
             if (f != null)
                 f.SetObjetivo(objetivoActual.transform, danio);
         }

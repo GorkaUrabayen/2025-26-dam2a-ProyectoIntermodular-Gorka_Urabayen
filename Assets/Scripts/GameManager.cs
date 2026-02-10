@@ -1,50 +1,69 @@
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instancia;
 
-    [Header("Vidas")]
-    public int vidas = 20;
-
-    [Header("Dinero")]
+    [Header("Stats")]
+    public int vidas = 10;
     public int dinero = 100;
+
+    [Header("UI")]
+    public TMP_Text txtVidas;
+    public TMP_Text txtDinero;
 
     void Awake()
     {
-        instancia = this;
+        if (instancia == null)
+        {
+            instancia = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    // ❤️ PERDER VIDA
+    void Start()
+    {
+        ActualizarUI();
+    }
+
     public void PerderVida(int cantidad)
     {
         vidas -= cantidad;
-        Debug.Log("Vidas restantes: " + vidas);
+        ActualizarUI();
 
         if (vidas <= 0)
-            GameOver();
-    }
-
-    void GameOver()
-    {
-        Debug.Log("GAME OVER");
-        Time.timeScale = 0f;
-    }
-
-    // 💰 DINERO
-    public bool GastarDinero(int cantidad)
-    {
-        if (dinero < cantidad)
-            return false;
-
-        dinero -= cantidad;
-        Debug.Log("Dinero restante: " + dinero);
-        return true;
+        {
+            Debug.Log("Has perdido");
+        }
     }
 
     public void GanarDinero(int cantidad)
     {
         dinero += cantidad;
-        Debug.Log("Dinero: " + dinero);
+        ActualizarUI();
+    }
+
+    public bool GastarDinero(int cantidad)
+    {
+        if (dinero >= cantidad)
+        {
+            dinero -= cantidad;
+            ActualizarUI();
+            return true;
+        }
+        return false;
+    }
+
+    void ActualizarUI()
+    {
+        if (txtVidas != null)
+            txtVidas.text = "Vidas: " + vidas;
+
+        if (txtDinero != null)
+            txtDinero.text = "Dinero: " + dinero;
     }
 }

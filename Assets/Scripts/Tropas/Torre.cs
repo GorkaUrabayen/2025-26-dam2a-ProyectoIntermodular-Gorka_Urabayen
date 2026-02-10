@@ -2,15 +2,18 @@ using UnityEngine;
 
 public class Torre : MonoBehaviour
 {
+    [Header("Disparo")]
     public GameObject flechaPrefab;
     public Transform puntoDisparo;
     public float alcance = 5f;
     public float cadencia = 1f;
     public int danio = 5;
 
-    public int coste = 20;
-public bool estaColocada = false;
+    [Header("Coste")]
+    public int coste = 20; // Cuánto cuesta la torre
 
+    [HideInInspector]
+    public bool estaColocada = false; // Solo dispara si está colocada
 
     protected float tiempoUltimoDisparo = 0f;
     protected Enemigo objetivoActual;
@@ -20,7 +23,7 @@ public bool estaColocada = false;
 
     void Update()
     {
-        if (!estaColocada) return;
+        if (!estaColocada) return; // ❌ No dispara hasta que esté colocada
 
         objetivoActual = BuscarEnemigoCercano();
 
@@ -66,9 +69,7 @@ public bool estaColocada = false;
         if (objetivoActual == null) return;
 
         Vector3 dir = objetivoActual.transform.position - transform.position;
-
-        transform.localScale =
-            dir.x < 0 ? new Vector3(-1, 1, 1) : new Vector3(1, 1, 1);
+        transform.localScale = dir.x < 0 ? new Vector3(-1, 1, 1) : new Vector3(1, 1, 1);
     }
 
     protected virtual void Atacar()
@@ -76,9 +77,7 @@ public bool estaColocada = false;
         if (flechaPrefab != null && puntoDisparo != null && objetivoActual != null)
         {
             GameObject flecha = Instantiate(flechaPrefab, puntoDisparo.position, Quaternion.identity);
-
             Flecha f = flecha.GetComponent<Flecha>();
-
             if (f != null)
                 f.SetObjetivo(objetivoActual.transform, danio);
         }

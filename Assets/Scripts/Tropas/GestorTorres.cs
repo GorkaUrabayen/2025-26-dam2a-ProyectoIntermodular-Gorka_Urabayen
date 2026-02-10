@@ -40,42 +40,40 @@ public class GestorTorres : MonoBehaviour
         SetAlpha(torreTemporal, 0.5f);
     }
 
-   void ColocarTorre(Vector3 posicion)
-{
-    if (torreTemporal == null) return;
-
-    Vector3Int celda = generadorMapa.tilemap.WorldToCell(posicion);
-
-    int x = celda.x;
-    int y = celda.y;
-
-    if (x < 0 || y < 0 || x >= generadorMapa.anchoMapa || y >= generadorMapa.altoMapa)
-        return;
-
-    int valor = generadorMapa.mapa[x, y];
-
-    if (valor == 1 || valor == 2)
+    void ColocarTorre(Vector3 posicion)
     {
-        Debug.Log("No puedes colocar aquí");
-        return;
+        if (torreTemporal == null) return;
+
+        Vector3Int celda = generadorMapa.tilemap.WorldToCell(posicion);
+
+        int x = celda.x;
+        int y = celda.y;
+
+        if (x < 0 || y < 0 || x >= generadorMapa.anchoMapa || y >= generadorMapa.altoMapa)
+            return;
+
+        int valor = generadorMapa.mapa[x, y];
+
+        if (valor == 1 || valor == 2)
+        {
+            Debug.Log("No puedes colocar aquí");
+            return;
+        }
+
+        Torre torre = torreTemporal.GetComponent<Torre>();
+
+        if (!GameManager.instancia.GastarDinero(torre.coste))
+        {
+            Debug.Log("No tienes dinero");
+            return;
+        }
+
+        SetAlpha(torreTemporal, 1f);
+
+        torre.estaColocada = true;
+        torreTemporal = null;
+        modoColocacion = false;
     }
-
-    Torre torre = torreTemporal.GetComponent<Torre>();
-
-    // 💰 COMPROBAR DINERO
-    if (!GameManager.instancia.GastarDinero(torre.coste))
-    {
-        Debug.Log("No tienes dinero");
-        return;
-    }
-
-    SetAlpha(torreTemporal, 1f);
-
-    torre.estaColocada = true;
-    torreTemporal = null;
-    modoColocacion = false;
-}
-
 
     void CancelarColocacion()
     {
@@ -89,7 +87,6 @@ public class GestorTorres : MonoBehaviour
     void SetAlpha(GameObject obj, float alpha)
     {
         SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
-
         if (sr != null)
         {
             Color c = sr.color;

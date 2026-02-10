@@ -13,39 +13,42 @@ public class GestorTorres : MonoBehaviour
     {
         if (!modoColocacion || torreTemporal == null) return;
 
-        // 1. Obtener posición del ratón en el mundo
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f));
+        // 1. Posición del ratón corregida
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.z = 0f;
 
-        // 2. Convertir a coordenadas de celda del Tilemap
-        // Esto es lo que soluciona que el clic "elija la de arriba"
-        Vector3Int celdaActual = generadorMapa.tilemap.WorldToCell(mousePos);
+        // 2. Calculamos la celda según el ratón
+        Vector3Int celdaApuntada = generadorMapa.tilemap.WorldToCell(mousePos);
         
-        // 3. Posicionar el fantasma en el centro real de la celda
-        Vector3 posCentrada = generadorMapa.tilemap.GetCellCenterWorld(celdaActual);
-        posCentrada.z = -1f; 
+        // 3. Forzamos el centro de la celda para el dibujo
+        Vector3 posFinalMundo = generadorMapa.tilemap.GetCellCenterWorld(celdaApuntada);
+        posFinalMundo.z = -1f; 
         
-        torreTemporal.transform.position = posCentrada;
+        torreTemporal.transform.position = posFinalMundo;
 
-        // 4. Feedback visual (Rojo si no se puede colocar)
-        ActualizarColor(celdaActual);
+        // 4. Feedback visual
+        ActualizarColor(celdaApuntada);
 
         if (Input.GetMouseButtonDown(0))
-            IntentarColocarTorre(celdaActual);
+            IntentarColocarTorre(celdaApuntada);
 
         if (Input.GetMouseButtonDown(1))
             CancelarColocacion();
     }
 
-    bool EsPosicionValida(Vector3Int celda)
+    // --- EL BLOQUEO REAL ESTÁ AQUÍ ---
+    bool EsPosicionConstruible(Vector3Int celda)
     {
-        // Validar que no nos salgamos del array 'mapa'
+        // Si se sale del mapa, bloqueamos
         if (celda.x < 0 || celda.x >= generadorMapa.anchoMapa || 
             celda.y < 0 || celda.y >= generadorMapa.altoMapa) return false;
 
-        // Comprobar en tu matriz GenerarMapa.mapa
-        // 0 = Suelo libre, 1 = Camino, 2 = Borde, 3 = Torre ya ocupada
-        return generadorMapa.mapa[celda.x, celda.y] == 0;
+        // ACCEDEMOS A TU MATRIZ: 
+        // 0 = Suelo, 1 = Camino, 2 = Borde, 3 = Torre
+        int valorEnMatriz = generadorMapa.mapa[celda.x, celda.y];
+
+        // SOLO permitimos si es exactamente 0
+        return valorEnMatriz == 0;
     }
 
     void ActualizarColor(Vector3Int celda)
@@ -53,22 +56,22 @@ public class GestorTorres : MonoBehaviour
         SpriteRenderer sr = torreTemporal.GetComponent<SpriteRenderer>();
         if (sr == null) return;
 
-        // Si la posición es válida (valor 0), blanco transparente. Si no, rojo.
-        sr.color = EsPosicionValida(celda) ? new Color(1, 1, 1, 0.5f) : new Color(1, 0, 0, 0.5f);
+        if (EsPosicionConstruible(celda))
+            sr.color = new Color(1, 1, 1, 0.5f); // Blanco transparente
+        else
+            sr.color = new Color(1, 0, 0, 0.5f); // Rojo: PROHIBIDO
     }
 
     void IntentarColocarTorre(Vector3Int celda)
     {
-        if (!EsPosicionValida(celda))
-        {
-            Debug.Log("No puedes colocar aquí: camino u ocupado");
-            return;
-        }
+        // Doble comprobación: si no es construible, salimos
+        if (!EsPosicionConstruible(celda)) return;
 
         Torre torreScript = torreTemporal.GetComponent<Torre>();
+        
         if (GameManager.instancia.GastarDinero(torreScript.coste))
         {
-            // MARCAR CELDA COMO OCUPADA (Valor 3)
+            // Marcamos la celda como ocupada por torre (3)
             generadorMapa.mapa[celda.x, celda.y] = 3; 
 
             SpriteRenderer sr = torreTemporal.GetComponent<SpriteRenderer>();

@@ -4,32 +4,42 @@ public class Arquero : Torre
 {
     protected void Awake()
     {
-        alcance = 2f; // Ejemplo: menos alcance que torre base
-        coste = 30;   // Ejemplo: el arquero cuesta 30 monedas
+        alcance = 3f;
+        coste = 30;
     }
 
     protected override void Atacar()
     {
         if (objetivoActual == null) return;
 
-        Vector3 direccion = objetivoActual.transform.position - transform.position;
-        float angulo = Mathf.Atan2(direccion.y, direccion.x) * Mathf.Rad2Deg;
+        Vector2 dir = (objetivoActual.transform.position - transform.position).normalized;
 
         if (animator != null)
         {
-            if (angulo >= 67.5f && angulo < 112.5f)
-                animator.Play("Shoot Up");
-            else if (angulo >= 22.5f && angulo < 67.5f)
-                animator.Play("Shoot Diagonal Up");
-            else if (angulo >= -22.5f && angulo < 22.5f)
-                animator.Play("Shoot Front");
-            else if (angulo >= -67.5f && angulo < -22.5f)
-                animator.Play("Shoot Diagonal Down");
+            // ARRIBA
+            if (dir.y > 0.6f)
+            {
+                if (Mathf.Abs(dir.x) < 0.3f)
+                    animator.Play("Shoot Up");
+                else
+                    animator.Play("Shoot Diagonal Up");
+            }
+            // ABAJO
+            else if (dir.y < -0.6f)
+            {
+                if (Mathf.Abs(dir.x) < 0.3f)
+                    animator.Play("Shoot Down");
+                else
+                    animator.Play("Shoot Diagonal Down");
+            }
+            // LATERAL
             else
-                animator.Play("Shoot Down");
+            {
+                animator.Play("Shoot Front");
+            }
         }
 
-        // Instanciar flecha
+        // DISPARO
         if (flechaPrefab != null && puntoDisparo != null)
         {
             GameObject flecha = Instantiate(flechaPrefab, puntoDisparo.position, Quaternion.identity);

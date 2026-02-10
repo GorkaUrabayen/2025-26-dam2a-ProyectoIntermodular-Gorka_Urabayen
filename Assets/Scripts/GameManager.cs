@@ -13,32 +13,36 @@ public class GameManager : MonoBehaviour
     public TMP_Text txtVidas;
     public TMP_Text txtDinero;
 
+    [Header("Cursor del Sistema")]
+    public Texture2D cursorSprite;
+    public Vector2 hotSpot = Vector2.zero; 
+
     void Awake()
     {
-        if (instancia == null)
-        {
-            instancia = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        if (instancia == null) instancia = this;
+        else Destroy(gameObject);
     }
 
     void Start()
     {
         ActualizarUI();
+        ConfigurarCursor();
+    }
+
+    public void ConfigurarCursor()
+    {
+        if (cursorSprite != null)
+        {
+            // CursorMode.Auto usa el hardware para evitar lag visual
+            Cursor.SetCursor(cursorSprite, hotSpot, CursorMode.Auto);
+        }
     }
 
     public void PerderVida(int cantidad)
     {
         vidas -= cantidad;
         ActualizarUI();
-
-        if (vidas <= 0)
-        {
-            Debug.Log("Has perdido");
-        }
+        if (vidas <= 0) Debug.Log("Has perdido");
     }
 
     public void GanarDinero(int cantidad)
@@ -60,10 +64,7 @@ public class GameManager : MonoBehaviour
 
     void ActualizarUI()
     {
-        if (txtVidas != null)
-            txtVidas.text = "Vidas: " + vidas;
-
-        if (txtDinero != null)
-            txtDinero.text = "Dinero: " + dinero;
+        if (txtVidas != null) txtVidas.text = "Vidas: " + vidas;
+        if (txtDinero != null) txtDinero.text = "Dinero: " + dinero;
     }
 }

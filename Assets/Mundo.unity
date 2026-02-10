@@ -259,6 +259,8 @@ MonoBehaviour:
   dinero: 100
   txtVidas: {fileID: 1174735708}
   txtDinero: {fileID: 430511178}
+  cursorSprite: {fileID: 2800000, guid: fe26d2ed460e4944e9bd45b977856d74, type: 3}
+  hotSpot: {x: 0, y: 0}
 --- !u!4 &142507664
 Transform:
   m_ObjectHideFlags: 0
@@ -896,7 +898,7 @@ Transform:
   m_GameObject: {fileID: 456512150}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.4929147, y: 6.6090016, z: -0.09199461}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

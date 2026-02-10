@@ -2,96 +2,96 @@ using UnityEngine;
 
 public class GestorTorres : MonoBehaviour
 {
-    public GameObject prefabArquero;
-    public GenerarMapa generadorMapa;
+    [Header("Prefabs")]
+    public GameObject prefabArquero;       
+    public GenerarMapa generadorMapa;      
 
-    private GameObject torreTemporal;
+    private GameObject torreTemporal;      
     private bool modoColocacion = false;
 
     void Update()
     {
-        if (!modoColocacion) return;
+        if (!modoColocacion || torreTemporal == null) return;
 
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        // 1. Obtener posición del ratón en el mundo
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f));
         mousePos.z = 0f;
 
-        if (torreTemporal != null)
-            torreTemporal.transform.position = mousePos;
+        // 2. Convertir a coordenadas de celda del Tilemap
+        // Esto es lo que soluciona que el clic "elija la de arriba"
+        Vector3Int celdaActual = generadorMapa.tilemap.WorldToCell(mousePos);
+        
+        // 3. Posicionar el fantasma en el centro real de la celda
+        Vector3 posCentrada = generadorMapa.tilemap.GetCellCenterWorld(celdaActual);
+        posCentrada.z = -1f; 
+        
+        torreTemporal.transform.position = posCentrada;
+
+        // 4. Feedback visual (Rojo si no se puede colocar)
+        ActualizarColor(celdaActual);
 
         if (Input.GetMouseButtonDown(0))
-            ColocarTorre(mousePos);
+            IntentarColocarTorre(celdaActual);
 
         if (Input.GetMouseButtonDown(1))
             CancelarColocacion();
     }
 
+    bool EsPosicionValida(Vector3Int celda)
+    {
+        // Validar que no nos salgamos del array 'mapa'
+        if (celda.x < 0 || celda.x >= generadorMapa.anchoMapa || 
+            celda.y < 0 || celda.y >= generadorMapa.altoMapa) return false;
+
+        // Comprobar en tu matriz GenerarMapa.mapa
+        // 0 = Suelo libre, 1 = Camino, 2 = Borde, 3 = Torre ya ocupada
+        return generadorMapa.mapa[celda.x, celda.y] == 0;
+    }
+
+    void ActualizarColor(Vector3Int celda)
+    {
+        SpriteRenderer sr = torreTemporal.GetComponent<SpriteRenderer>();
+        if (sr == null) return;
+
+        // Si la posición es válida (valor 0), blanco transparente. Si no, rojo.
+        sr.color = EsPosicionValida(celda) ? new Color(1, 1, 1, 0.5f) : new Color(1, 0, 0, 0.5f);
+    }
+
+    void IntentarColocarTorre(Vector3Int celda)
+    {
+        if (!EsPosicionValida(celda))
+        {
+            Debug.Log("No puedes colocar aquí: camino u ocupado");
+            return;
+        }
+
+        Torre torreScript = torreTemporal.GetComponent<Torre>();
+        if (GameManager.instancia.GastarDinero(torreScript.coste))
+        {
+            // MARCAR CELDA COMO OCUPADA (Valor 3)
+            generadorMapa.mapa[celda.x, celda.y] = 3; 
+
+            SpriteRenderer sr = torreTemporal.GetComponent<SpriteRenderer>();
+            sr.color = Color.white;
+            sr.sortingOrder = 5; 
+            
+            torreScript.estaColocada = true;
+            torreTemporal = null;
+            modoColocacion = false;
+        }
+    }
+
     public void EmpezarColocacion()
     {
         if (modoColocacion) return;
-
         modoColocacion = true;
-
         torreTemporal = Instantiate(prefabArquero);
-
-        Torre t = torreTemporal.GetComponent<Torre>();
-        if (t != null)
-            t.estaColocada = false;
-
-        SetAlpha(torreTemporal, 0.5f);
-    }
-
-    void ColocarTorre(Vector3 posicion)
-    {
-        if (torreTemporal == null) return;
-
-        Vector3Int celda = generadorMapa.tilemap.WorldToCell(posicion);
-
-        int x = celda.x;
-        int y = celda.y;
-
-        if (x < 0 || y < 0 || x >= generadorMapa.anchoMapa || y >= generadorMapa.altoMapa)
-            return;
-
-        int valor = generadorMapa.mapa[x, y];
-
-        if (valor == 1 || valor == 2)
-        {
-            Debug.Log("No puedes colocar aquí");
-            return;
-        }
-
-        Torre torre = torreTemporal.GetComponent<Torre>();
-
-        if (!GameManager.instancia.GastarDinero(torre.coste))
-        {
-            Debug.Log("No tienes dinero");
-            return;
-        }
-
-        SetAlpha(torreTemporal, 1f);
-
-        torre.estaColocada = true;
-        torreTemporal = null;
-        modoColocacion = false;
+        torreTemporal.GetComponent<Torre>().estaColocada = false;
     }
 
     void CancelarColocacion()
     {
-        if (torreTemporal != null)
-            Destroy(torreTemporal);
-
-        torreTemporal = null;
+        if (torreTemporal != null) Destroy(torreTemporal);
         modoColocacion = false;
-    }
-
-    void SetAlpha(GameObject obj, float alpha)
-    {
-        SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
-        if (sr != null)
-        {
-            Color c = sr.color;
-            c.a = alpha;
-            sr.color = c;
-        }
     }
 }

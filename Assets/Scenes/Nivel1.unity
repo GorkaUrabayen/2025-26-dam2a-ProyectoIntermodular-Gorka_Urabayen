@@ -255,7 +255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d4f2dd9acb094043912adc8fd1f7f8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vidas: 1
+  vidas: 10
   dinero: 30
   txtVidas: {fileID: 1174735708}
   txtDinero: {fileID: 430511178}
@@ -1126,7 +1126,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -333.2, y: -2.4}
+  m_AnchoredPosition: {x: -543, y: 82.786}
   m_SizeDelta: {x: 64.9008, y: 65.572}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1298952609

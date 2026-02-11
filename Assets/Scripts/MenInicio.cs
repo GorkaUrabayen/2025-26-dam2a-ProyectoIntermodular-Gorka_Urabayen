@@ -6,7 +6,7 @@ public class MenuInicio : MonoBehaviour
     // TIENE QUE SER PUBLIC
     public void Jugar() 
     {
-        SceneManager.LoadScene("Mundo"); 
+        SceneManager.LoadScene("Nivel1"); 
     }
 
     // TIENE QUE SER PUBLIC

@@ -15,6 +15,7 @@ public class Enemigo : MonoBehaviour
     public int vida = 10;
     private bool estaVivo = true;
 
+    // Delegado y Evento para avisar al Spawner
     public delegate void LlegadaFinal();
     public event LlegadaFinal OnLlegadaFinal;
 
@@ -53,41 +54,51 @@ public class Enemigo : MonoBehaviour
             animator.SetBool("Caminando", true);
     }
 
-   protected virtual void Mover()
-{
-    if (indiceWaypoint >= waypoints.Count) return;
-
-    Vector3 objetivo = waypoints[indiceWaypoint];
-    objetivo.z = 0;
-
-    float paso = velocidad * Time.deltaTime;
-
-    Vector2 direccion = (Vector2)objetivo - rb.position;
-    float distancia = direccion.magnitude;
-
-    // 👇 SI LLEGA AL PUNTO EXACTO
-    if (distancia <= paso)
+    protected virtual void Mover()
     {
-        rb.MovePosition(objetivo);
-        indiceWaypoint++;
+        if (indiceWaypoint >= waypoints.Count || !estaVivo) return;
 
-        // 🏁 FINAL DEL CAMINO
-        if (indiceWaypoint >= waypoints.Count)
+        Vector3 objetivo = waypoints[indiceWaypoint];
+        objetivo.z = 0;
+
+        Vector2 direccion = (Vector2)objetivo - rb.position;
+        float distancia = direccion.magnitude;
+
+        // Margen de error de 0.1f para detectar que llegó al punto
+        if (distancia < 0.1f)
         {
-            listoParaMover = false;
+            indiceWaypoint++;
 
-            GameManager.instancia.PerderVida(1);
-            Morir(false);
-
-            return;
+            // Si ya no hay más puntos, ha llegado a la meta
+            if (indiceWaypoint >= waypoints.Count)
+            {
+                LlegarAlFinal();
+                return;
+            }
+        }
+        else
+        {
+            float paso = velocidad * Time.deltaTime;
+            // MovePosition es mejor para Rigidbodies Kinematic
+            rb.MovePosition(rb.position + direccion.normalized * Mathf.Min(paso, distancia));
         }
     }
-    else
-    {
-        rb.MovePosition(rb.position + direccion.normalized * paso);
-    }
-}
 
+    private void LlegarAlFinal()
+    {
+        if (!estaVivo) return;
+
+        listoParaMover = false;
+
+        // Disparamos el evento para que el Spawner reste vida
+        if (OnLlegadaFinal != null)
+        {
+            OnLlegadaFinal.Invoke();
+        }
+
+        // El enemigo muere sin dar dinero (muerte por llegar a la meta)
+        Morir(false);
+    }
 
     public void RecibirDanio(int cantidad)
     {
@@ -100,8 +111,10 @@ public class Enemigo : MonoBehaviour
 
         if (vida <= 0)
         {
-            // 💰 ganas dinero SOLO al matarlo
-            GameManager.instancia.GanarDinero(5);
+            // Solo da dinero si el jugador lo mata
+            if (GameManager.instancia != null)
+                GameManager.instancia.GanarDinero(5);
+            
             Morir(true);
         }
     }
@@ -116,6 +129,7 @@ public class Enemigo : MonoBehaviour
         if (animator != null)
             animator.SetTrigger("Morir");
 
+        // Destruimos el objeto
         Destroy(gameObject);
     }
 }

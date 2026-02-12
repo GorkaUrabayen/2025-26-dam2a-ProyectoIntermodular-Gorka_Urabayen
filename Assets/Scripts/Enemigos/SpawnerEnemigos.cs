@@ -25,13 +25,13 @@ public class SpawnerOleadas : MonoBehaviour
 
     IEnumerator IniciarSpawner()
     {
+        // Esperamos a que el mapa esté listo y tenga waypoints
         while (mapaScript == null || mapaScript.waypoints == null || mapaScript.waypoints.Count < 2)
         {
             yield return null;
         }
 
         waypoints = new List<Vector3>(mapaScript.waypoints);
-
         StartCoroutine(IniciarOleadas());
     }
 
@@ -70,20 +70,25 @@ public class SpawnerOleadas : MonoBehaviour
                 prefab = prefabsExtra[index];
         }
 
+        // Instanciar en el primer waypoint
         GameObject nuevoEnemigo = Instantiate(prefab, waypoints[0], Quaternion.identity);
 
         Enemigo enemigoScript = nuevoEnemigo.GetComponent<Enemigo>();
         if (enemigoScript != null)
         {
             enemigoScript.SetWaypoints(waypoints);
+            // Nos suscribimos al evento para saber cuando llega al final
             enemigoScript.OnLlegadaFinal += EnemigoLlegadoAlFinal;
         }
     }
 
+    // Esta función se ejecuta automáticamente cuando un enemigo toca el último waypoint
     void EnemigoLlegadoAlFinal()
     {
         if (GameManager.instancia != null)
+        {
             GameManager.instancia.PerderVida(1);
+        }
     }
 
     public void Pausar() => pausado = true;

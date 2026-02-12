@@ -26,7 +26,7 @@ public class Arquero : Torre
             else if (dir.y < -0.6f)
             {
                 if (Mathf.Abs(dir.x) < 0.3f) animator.Play("Shoot Down");
-                else animator.Play("Shoot Diagonal Down");
+                else animator.Play("Shoot Diagona Down");
             }
             else
             {

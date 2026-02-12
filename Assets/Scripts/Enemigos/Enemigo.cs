@@ -30,11 +30,14 @@ public class Enemigo : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Kinematic;
     }
 
-    void Update()
-    {
-        if (listoParaMover && estaVivo)
-            Mover();
-    }
+   void Update()
+{
+    // Si el tiempo está detenido, el enemigo no ejecuta su lógica de movimiento
+    if (Mathf.Approximately(Time.timeScale, 0f)) return;
+
+    if (listoParaMover && estaVivo)
+        Mover();
+}
 
     public void SetWaypoints(List<Vector3> puntos)
     {

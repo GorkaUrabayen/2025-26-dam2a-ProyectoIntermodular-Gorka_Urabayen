@@ -75,11 +75,21 @@ public class GenerarMapa : MonoBehaviour
 
         foreach (var celda in camino)
         {
-            tilemap.SetTile(new Vector3Int(celda.x, celda.y, 0), caminoTile);
+            Vector3Int posCelda = new Vector3Int(celda.x, celda.y, 0);
+            
+            // Colocamos el tile visualmente
+            tilemap.SetTile(posCelda, caminoTile);
+            
+            // Marcamos en la matriz lógica (1 = camino)
             mapa[celda.x, celda.y] = 1;
 
-            // Ajuste: z=-1 para que esté delante del Tilemap
-            waypoints.Add(tilemap.CellToWorld(new Vector3Int(celda.x, celda.y, 0)) + new Vector3(0.5f, 0.5f, -1f));
+            // --- ESTE ES EL CAMBIO CLAVE ---
+            // Usamos GetCellCenterWorld para que Unity nos de el centro exacto de la casilla
+            // así los enemigos irán por el medio perfecto.
+            Vector3 centroMundo = tilemap.GetCellCenterWorld(posCelda);
+            centroMundo.z = -1f; // Mantenemos el z=-1 para que el enemigo se vea por encima
+            
+            waypoints.Add(centroMundo);
         }
     }
 

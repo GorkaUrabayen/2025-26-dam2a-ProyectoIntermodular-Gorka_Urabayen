@@ -567,7 +567,7 @@ Tilemap:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: 0, y: 0, z: 0}
   m_Size: {x: 477, y: 270, z: 1}
-  m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
+  m_TileAnchor: {x: 0, y: 0, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
     e00: 1
@@ -767,7 +767,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8.60799
+  orthographic size: 9
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -792,7 +792,7 @@ Transform:
   m_GameObject: {fileID: 339590358}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.18, y: 8.64, z: -10}
+  m_LocalPosition: {x: 6.2, y: 8.7, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -907,8 +907,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 704.1, y: 87.5}
-  m_SizeDelta: {x: 91.1713, y: 51.7841}
+  m_AnchoredPosition: {x: 722.3327, y: 88.229294}
+  m_SizeDelta: {x: 127.6368, y: 50.3255}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &430511178
 MonoBehaviour:
@@ -993,7 +993,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -59.706757, w: 14.319943}
+  m_margin: {x: 0, y: 0, z: 0.38837433, w: 0.025453566}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1054,6 +1054,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabArquero: {fileID: 6951866107963330049, guid: 01c0b473dcc57f24c82eae05f39bb3f1, type: 3}
   generadorMapa: {fileID: 199372658}
+  correccionVisual: {x: 0, y: -0.5}
+  forzarCentroRejilla: 1
 --- !u!1 &1002188065
 GameObject:
   m_ObjectHideFlags: 0

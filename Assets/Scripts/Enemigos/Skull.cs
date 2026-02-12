@@ -6,6 +6,6 @@ public class Skull : Enemigo
     {
         base.Awake();
         velocidad = 10f;
-        vida = 5;
+        vida = 6;
     }
 }

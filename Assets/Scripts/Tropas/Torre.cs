@@ -7,7 +7,7 @@ public class Torre : MonoBehaviour
     public Transform puntoDisparo;
     public float alcance = 5f;
     public float cadencia = 1f;
-    public int danio = 5;
+    public int danio = 2;
 
     [Header("Coste")]
     public int coste = 20; // Cuánto cuesta la torre

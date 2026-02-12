@@ -6,6 +6,7 @@ public class Arquero : Torre
     {
         alcance = 3f;
         coste = 30;
+        danio = 3; // <--- Cambiamos el daño a 3 (6 vida / 2 disparos = 3 daño)
     }
 
     protected override void Atacar()
@@ -16,23 +17,17 @@ public class Arquero : Torre
 
         if (animator != null)
         {
-            // ARRIBA
+            // Lógica de animaciones (sin cambios)
             if (dir.y > 0.6f)
             {
-                if (Mathf.Abs(dir.x) < 0.3f)
-                    animator.Play("Shoot Up");
-                else
-                    animator.Play("Shoot Diagonal Up");
+                if (Mathf.Abs(dir.x) < 0.3f) animator.Play("Shoot Up");
+                else animator.Play("Shoot Diagonal Up");
             }
-            // ABAJO
             else if (dir.y < -0.6f)
             {
-                if (Mathf.Abs(dir.x) < 0.3f)
-                    animator.Play("Shoot Down");
-                else
-                    animator.Play("Shoot Diagonal Down");
+                if (Mathf.Abs(dir.x) < 0.3f) animator.Play("Shoot Down");
+                else animator.Play("Shoot Diagonal Down");
             }
-            // LATERAL
             else
             {
                 animator.Play("Shoot Front");
@@ -45,7 +40,8 @@ public class Arquero : Torre
             GameObject flecha = Instantiate(flechaPrefab, puntoDisparo.position, Quaternion.identity);
             Flecha f = flecha.GetComponent<Flecha>();
             if (f != null)
-                f.SetObjetivo(objetivoActual.transform, danio);
+                // Aquí pasamos el daño de 3 que definimos arriba
+                f.SetObjetivo(objetivoActual.transform, danio); 
         }
     }
 }

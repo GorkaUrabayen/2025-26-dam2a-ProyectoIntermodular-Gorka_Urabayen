@@ -21,9 +21,15 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         if (instancia == null)
+        {
             instancia = this;
+            // Si quieres que el GameManager dure entre niveles, descomenta la siguiente línea:
+            // DontDestroyOnLoad(gameObject);
+        }
         else
+        {
             Destroy(gameObject);
+        }
     }
 
     void Start()
@@ -43,9 +49,7 @@ public class GameManager : MonoBehaviour
     public void PerderVida(int cantidad)
     {
         vidas -= cantidad;
-
-        if (vidas < 0)
-            vidas = 0;
+        if (vidas < 0) vidas = 0;
 
         ActualizarUI();
 
@@ -57,6 +61,11 @@ public class GameManager : MonoBehaviour
 
     void CargarDerrota()
     {
+        // Antes de ir a la escena de derrota, paramos la música del nivel
+        if (AudioManager.instancia != null)
+        {
+            AudioManager.instancia.DetenerMusicaYDestruir();
+        }
         SceneManager.LoadScene("Derrota");
     }
 
@@ -77,7 +86,7 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    void ActualizarUI()
+    public void ActualizarUI()
     {
         if (txtVidas != null)
             txtVidas.text = "Vidas: " + vidas;

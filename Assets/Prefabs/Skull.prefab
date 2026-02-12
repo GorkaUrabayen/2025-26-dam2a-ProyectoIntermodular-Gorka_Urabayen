@@ -271,7 +271,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocidad: 2
-  vida: 10
+  vida: 6
   animator: {fileID: 0}
 --- !u!114 &1410024272625821651
 MonoBehaviour:

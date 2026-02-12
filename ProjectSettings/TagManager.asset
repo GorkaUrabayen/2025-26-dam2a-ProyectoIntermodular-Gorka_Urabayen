@@ -9,10 +9,10 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Suelo
+  - Fondo
   - Water
   - UI
-  - Camino
+  - Suelo
   - Unidades
   - 
   - 
@@ -42,9 +42,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Unidades
-    uniqueID: 1765536329
+  - name: Fondo
+    uniqueID: 452079533
     locked: 0
   - name: Suelo
     uniqueID: 3254415393
+    locked: 0
+  - name: Unidades
+    uniqueID: 1765536329
+    locked: 0
+  - name: UI
+    uniqueID: 1330907691
     locked: 0

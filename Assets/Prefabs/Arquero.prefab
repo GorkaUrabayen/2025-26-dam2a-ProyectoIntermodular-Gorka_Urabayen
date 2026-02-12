@@ -230,10 +230,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flechaPrefab: {fileID: 5104650842868696795, guid: 6db611888f0233340a2674f461db452f, type: 3}
   puntoDisparo: {fileID: 3459007012015553506}
-  alcance: 5
+  alcance: 2
   cadencia: 1
-  danio: 10
-  coste: 20
+  danio: 3
+  coste: 30
   estaColocada: 0
   animator: {fileID: 532370109953220764}
 --- !u!61 &7466651341646539326
@@ -271,7 +271,7 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
+    pivot: {x: 0.5, y: 0}
     oldSize: {x: 0.62, y: 0.75}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5

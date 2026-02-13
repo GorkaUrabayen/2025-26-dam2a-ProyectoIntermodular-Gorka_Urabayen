@@ -10,14 +10,14 @@ public class ControladorOpciones : MonoBehaviour
 
     void Start()
     {
-        // Cargamos valores guardados o ponemos por defecto (0.5 y 1.0)
-        float volGuardado = PlayerPrefs.GetFloat("VolumenMaster", 0.5f);
-        float sensGuardada = PlayerPrefs.GetFloat("SensibilidadRaton", 1.0f);
+        // Cargar valores guardados
+        float vol = PlayerPrefs.GetFloat("VolumenMaster", 0.5f);
+        float sens = PlayerPrefs.GetFloat("SensibilidadRaton", 1.0f);
 
-        if (sliderVolumen != null) sliderVolumen.value = volGuardado;
-        if (sliderSensibilidad != null) sliderSensibilidad.value = sensGuardada;
+        if (sliderVolumen != null) sliderVolumen.value = vol;
+        if (sliderSensibilidad != null) sliderSensibilidad.value = sens;
 
-        // Escuchamos cambios
+        // Escuchar cambios en tiempo real
         sliderVolumen.onValueChanged.AddListener(delegate { SetVolumen(); });
         sliderSensibilidad.onValueChanged.AddListener(delegate { SetSensibilidad(); });
     }
@@ -25,10 +25,8 @@ public class ControladorOpciones : MonoBehaviour
     public void SetVolumen()
     {
         PlayerPrefs.SetFloat("VolumenMaster", sliderVolumen.value);
-        if (AudioManager.instancia != null)
-        {
+        if (AudioManager.instancia != null) 
             AudioManager.instancia.ActualizarVolumen(sliderVolumen.value);
-        }
     }
 
     public void SetSensibilidad()
@@ -36,20 +34,10 @@ public class ControladorOpciones : MonoBehaviour
         PlayerPrefs.SetFloat("SensibilidadRaton", sliderSensibilidad.value);
     }
 
-   public bool esEscenaIndependiente = false; // Marcar como TRUE solo en la escena de Opciones
-
-public void Volver()
-{
-    if (esEscenaIndependiente)
+    public void Volver()
     {
-        string escenaAnterior = PlayerPrefs.GetString("UltimaEscena", "MenuInicio");
+        // Regresa a la escena guardada (Menu o Nivel) sin resetear
+        string escenaAnterior = PlayerPrefs.GetString("UltimaEscena", "MenuPrincipal");
         SceneManager.LoadScene(escenaAnterior);
     }
-    else
-    {
-        // Si es un panel dentro del nivel, simplemente se desactiva
-        gameObject.SetActive(false);
-        // Aquí podrías llamar al panel de pausa para que vuelva a aparecer
-    }
-}
 }

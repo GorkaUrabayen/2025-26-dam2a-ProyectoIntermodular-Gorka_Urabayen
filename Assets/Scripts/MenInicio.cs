@@ -16,9 +16,11 @@ public class MenuInicio : MonoBehaviour
     }
   public void AbrirOpciones()
     {
-        // Guardamos que venimos del Menu para que el boton "Volver" sepa regresar aqui
+      {
+        // Guardamos la escena actual antes de irnos
         PlayerPrefs.SetString("UltimaEscena", SceneManager.GetActiveScene().name);
-        SceneManager.LoadScene("Opciones"); // Asegurate de que se llame asi en Build Settings
+        SceneManager.LoadScene("Opciones"); 
+    }
 }
 public void VolverAEscenaAnterior()
     {

@@ -231,7 +231,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de41258c8a852174c908211896b5d222, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  source: {fileID: 0}
   esMusicaDeMenu: 0
+  esEscenaOpciones: 1
 --- !u!82 &758796032
 AudioSource:
   m_ObjectHideFlags: 0

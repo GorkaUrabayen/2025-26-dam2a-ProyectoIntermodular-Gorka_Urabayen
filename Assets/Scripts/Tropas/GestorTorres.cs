@@ -18,7 +18,8 @@ public class GestorTorres : MonoBehaviour
     {
         if (!modoColocacion || torreTemporal == null) return;
 
-        // 1. Obtener posición del ratón
+        // 1. Obtener posición del ratón y Sensibilidad
+        float sens = PlayerPrefs.GetFloat("SensibilidadRaton", 1.0f);
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = 0f;
 
@@ -26,18 +27,20 @@ public class GestorTorres : MonoBehaviour
         Vector3Int celdaApuntada = generadorMapa.tilemap.WorldToCell(mouseWorldPos);
 
         // 3. Posicionamiento Visual
-        Vector3 posFinal;
+        Vector3 posObjetivo;
         if (forzarCentroRejilla)
         {
-            posFinal = generadorMapa.tilemap.GetCellCenterWorld(celdaApuntada);
+            posObjetivo = generadorMapa.tilemap.GetCellCenterWorld(celdaApuntada);
         }
         else
         {
-            posFinal = mouseWorldPos;
+            // Si no forzamos al centro, usamos la sensibilidad para suavizar el seguimiento
+            // A más sensibilidad, el 'Lerp' es más rápido.
+            posObjetivo = Vector3.Lerp(torreTemporal.transform.position, mouseWorldPos, Time.deltaTime * 15f * sens);
         }
 
         // Aplicar correcciones
-        posFinal += (Vector3)correccionVisual;
+        Vector3 posFinal = posObjetivo + (Vector3)correccionVisual;
         posFinal.z = -1f; 
 
         torreTemporal.transform.position = posFinal;
@@ -45,7 +48,7 @@ public class GestorTorres : MonoBehaviour
         // 4. Feedback visual
         ActualizarColor(celdaApuntada);
 
-        // 5. Click Izquierdo: Confirmar (Aquí estaba el error, ahora pasamos posFinal)
+        // 5. Click Izquierdo: Confirmar
         if (Input.GetMouseButtonDown(0))
         {
             IntentarColocarTorre(celdaApuntada, posFinal);
@@ -79,18 +82,16 @@ public class GestorTorres : MonoBehaviour
             sr.color = new Color(1, 0.2f, 0.2f, 0.6f);
     }
 
-    // Corregido: Ahora esta función recibe la posición visual final para fijar la torre
     void IntentarColocarTorre(Vector3Int celda, Vector3 posVisual)
     {
         if (!EsPosicionConstruible(celda)) return;
 
-        // Asegúrate de que el script "Torre" tenga una variable pública "coste"
         Torre torreScript = torreTemporal.GetComponent<Torre>();
         int precio = (torreScript != null) ? torreScript.coste : 20; 
 
         if (GameManager.instancia.GastarDinero(precio))
         {
-            generadorMapa.mapa[celda.x, celda.y] = 3; // Marcamos como ocupado
+            generadorMapa.mapa[celda.x, celda.y] = 3; 
 
             torreTemporal.transform.position = posVisual;
 
@@ -105,10 +106,6 @@ public class GestorTorres : MonoBehaviour
             
             torreTemporal = null;
             modoColocacion = false;
-        }
-        else
-        {
-            Debug.Log("No tienes suficiente dinero");
         }
     }
 

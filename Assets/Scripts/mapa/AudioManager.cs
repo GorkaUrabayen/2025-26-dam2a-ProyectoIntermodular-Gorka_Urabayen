@@ -6,34 +6,38 @@ public class AudioManager : MonoBehaviour
     private AudioSource source;
 
     [Header("Configuración")]
-    // Marca esto SOLO en el AudioManager de la escena del Menú Principal
     public bool esMusicaDeMenu = false;
 
     void Awake()
+{
+    if (instancia == null)
     {
-        if (instancia == null)
-        {
-            instancia = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            // Si entramos al Menú y venimos de un nivel, cambiamos la música
-            if (esMusicaDeMenu)
-            {
-                instancia.DetenerMusicaYDestruir();
-                instancia = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                // Si ya hay música sonando y no es el menú, no creamos otro manager
-                Destroy(gameObject);
-                return;
-            }
-        }
-
+        instancia = this;
+        DontDestroyOnLoad(gameObject);
         source = GetComponent<AudioSource>();
+    }
+    else
+    {
+        // SI YA EXISTE UNA INSTANCIA...
+        // Pero este nuevo objeto tiene una canción diferente (la del nivel)
+        if (!esMusicaDeMenu && instancia.esMusicaDeMenu)
+        {
+            // Detenemos la música del menú y ponemos la de este nivel
+            instancia.source.clip = GetComponent<AudioSource>().clip;
+            instancia.source.Play();
+            instancia.esMusicaDeMenu = false; // Ya no estamos en el menú
+        }
+        
+        Destroy(gameObject);
+        return;
+    }
+}
+
+    // Esta función permite cambiar el volumen desde el slider de opciones
+    public void ActualizarVolumen(float nuevoVolumen)
+    {
+        if (source == null) source = GetComponent<AudioSource>();
+        source.volume = nuevoVolumen;
     }
 
     public void DetenerMusicaYDestruir()

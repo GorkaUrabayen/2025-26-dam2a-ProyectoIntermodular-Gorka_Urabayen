@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnerOleadas : MonoBehaviour
+// CAMBIADO: El nombre de la clase ahora coincide con el nombre del archivo
+public class SpawnerEnemigos : MonoBehaviour 
 {
     public GameObject prefabEnemigo;
     public List<GameObject> prefabsExtra;
@@ -31,6 +32,7 @@ public class SpawnerOleadas : MonoBehaviour
             yield return null;
         }
 
+        // Cargamos los waypoints del mapa
         waypoints = new List<Vector3>(mapaScript.waypoints);
         StartCoroutine(IniciarOleadas());
     }
@@ -59,6 +61,12 @@ public class SpawnerOleadas : MonoBehaviour
 
     void GenerarEnemigo()
     {
+        // Usamos siempre los waypoints actualizados del mapa
+        if (mapaScript != null && mapaScript.waypoints != null)
+        {
+            waypoints = new List<Vector3>(mapaScript.waypoints);
+        }
+
         if (waypoints == null || waypoints.Count < 2) return;
 
         GameObject prefab = prefabEnemigo;
@@ -82,7 +90,6 @@ public class SpawnerOleadas : MonoBehaviour
         }
     }
 
-    // Esta función se ejecuta automáticamente cuando un enemigo toca el último waypoint
     void EnemigoLlegadoAlFinal()
     {
         if (GameManager.instancia != null)

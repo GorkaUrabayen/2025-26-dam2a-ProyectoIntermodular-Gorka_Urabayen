@@ -15,7 +15,6 @@ public class Enemigo : MonoBehaviour
     public int vida = 10;
     private bool estaVivo = true;
 
-    // Delegado y Evento para avisar al Spawner
     public delegate void LlegadaFinal();
     public event LlegadaFinal OnLlegadaFinal;
 
@@ -30,23 +29,23 @@ public class Enemigo : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Kinematic;
     }
 
-   void Update()
-{
-    // Si el tiempo está detenido, el enemigo no ejecuta su lógica de movimiento
-    if (Mathf.Approximately(Time.timeScale, 0f)) return;
+    void Update()
+    {
+        // Pausa lógica
+        if (Mathf.Approximately(Time.timeScale, 0f)) return;
 
-    if (listoParaMover && estaVivo)
-        Mover();
-}
+        if (listoParaMover && estaVivo)
+            Mover();
+    }
 
     public void SetWaypoints(List<Vector3> puntos)
     {
-        if (puntos == null || puntos.Count < 2)
-            return;
+        if (puntos == null || puntos.Count < 2) return;
 
         waypoints = new List<Vector3>(puntos);
         indiceWaypoint = 0;
 
+        // Forzamos posición inicial con Z en 0
         Vector3 inicio = waypoints[0];
         inicio.z = 0;
         rb.position = inicio;
@@ -61,18 +60,19 @@ public class Enemigo : MonoBehaviour
     {
         if (indiceWaypoint >= waypoints.Count || !estaVivo) return;
 
-        Vector3 objetivo = waypoints[indiceWaypoint];
-        objetivo.z = 0;
-
-        Vector2 direccion = (Vector2)objetivo - rb.position;
+        // IMPORTANTE: Ignoramos la Z del waypoint para el cálculo
+        Vector3 puntoObjetivo = waypoints[indiceWaypoint];
+        Vector2 objetivo2D = new Vector2(puntoObjetivo.x, puntoObjetivo.y);
+        
+        Vector2 posicionActual2D = rb.position;
+        Vector2 direccion = objetivo2D - posicionActual2D;
         float distancia = direccion.magnitude;
 
-        // Margen de error de 0.1f para detectar que llegó al punto
+        // Si estamos muy cerca del punto (margen de 0.1)
         if (distancia < 0.1f)
         {
             indiceWaypoint++;
 
-            // Si ya no hay más puntos, ha llegado a la meta
             if (indiceWaypoint >= waypoints.Count)
             {
                 LlegarAlFinal();
@@ -82,8 +82,8 @@ public class Enemigo : MonoBehaviour
         else
         {
             float paso = velocidad * Time.deltaTime;
-            // MovePosition es mejor para Rigidbodies Kinematic
-            rb.MovePosition(rb.position + direccion.normalized * Mathf.Min(paso, distancia));
+            // Usamos MovePosition para un movimiento limpio en Kinematic
+            rb.MovePosition(posicionActual2D + direccion.normalized * Mathf.Min(paso, distancia));
         }
     }
 
@@ -91,15 +91,12 @@ public class Enemigo : MonoBehaviour
     {
         if (!estaVivo) return;
 
+        estaVivo = false; // Evitamos que procese más daño o movimiento
         listoParaMover = false;
 
-        // Disparamos el evento para que el Spawner reste vida
         if (OnLlegadaFinal != null)
-        {
             OnLlegadaFinal.Invoke();
-        }
 
-        // El enemigo muere sin dar dinero (muerte por llegar a la meta)
         Morir(false);
     }
 
@@ -114,7 +111,6 @@ public class Enemigo : MonoBehaviour
 
         if (vida <= 0)
         {
-            // Solo da dinero si el jugador lo mata
             if (GameManager.instancia != null)
                 GameManager.instancia.GanarDinero(5);
             
@@ -124,15 +120,12 @@ public class Enemigo : MonoBehaviour
 
     public void Morir(bool muertoPorJugador)
     {
-        if (!estaVivo) return;
-
         estaVivo = false;
         listoParaMover = false;
 
         if (animator != null)
             animator.SetTrigger("Morir");
 
-        // Destruimos el objeto
         Destroy(gameObject);
     }
 }

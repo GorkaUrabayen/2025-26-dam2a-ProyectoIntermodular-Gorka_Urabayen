@@ -15,10 +15,10 @@ GameObject:
   - component: {fileID: 6151775081039457956}
   - component: {fileID: -1267441903133531204}
   - component: {fileID: -3107462834693543172}
-  - component: {fileID: 2076651552739303112}
-  - component: {fileID: 1410024272625821651}
+  - component: {fileID: 2968659570336438785}
+  - component: {fileID: 1632311728041038586}
   m_Layer: 0
-  m_Name: Skull
+  m_Name: Oso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,12 +80,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -1915498550, guid: cfffbc71240607e4d9fc49c3c4389b5e, type: 3}
+  m_Sprite: {fileID: -186141835, guid: 7c56086bb6bacc34cabd05e0aeb941ff, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.77, y: 0.75}
+  m_Size: {x: 1.16, y: 0.96}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -101,7 +101,7 @@ Animator:
   m_GameObject: {fileID: 4679007936719127254}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 184635245b82dcb46abcff59c0ef58f3, type: 2}
+  m_Controller: {fileID: 2752700957667215200, guid: 0f9c0466ada4a7442961b5beaffa2246, type: 3}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -175,8 +175,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.77, y: 0.75}
-    newSize: {x: 0.77, y: 0.75}
+    oldSize: {x: 1.16, y: 0.96}
+    newSize: {x: 1.16, y: 0.96}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -258,7 +258,7 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
---- !u!114 &2076651552739303112
+--- !u!114 &2968659570336438785
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -267,13 +267,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4679007936719127254}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3844cefc368f8c46af726c9254fb1ae, type: 3}
+  m_Script: {fileID: 11500000, guid: 3be969cb4eda60d49b8e19c51a02a56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   velocidad: 2
-  vida: 6
+  vida: 10
   animator: {fileID: 0}
---- !u!114 &1410024272625821651
+--- !u!114 &1632311728041038586
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

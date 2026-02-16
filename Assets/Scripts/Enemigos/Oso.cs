@@ -1,11 +1,13 @@
 using UnityEngine;
+using System.Collections.Generic;
 
-public class Oso : Enemigo
+public class Oso : Enemigo 
 {
-    protected override void Awake()
+    // Usamos Start para cambiar las estadísticas sin romper el movimiento
+    void Start()
     {
-        base.Awake();
-        velocidad = 4f;
-        vida = 20;
+        // El Oso es un tanque lento
+        velocidad = 3f; 
+        vida = 40;
     }
 }

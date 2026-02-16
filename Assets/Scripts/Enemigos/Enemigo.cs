@@ -22,16 +22,20 @@ public class Enemigo : MonoBehaviour
     public Animator animator;
 
     protected Rigidbody2D rb;
+    private Collider2D col; // Referencia para desactivar colisiones
 
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        col = GetComponent<Collider2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
+        // Aseguramos que no tenga fuerzas acumuladas
+        rb.velocity = Vector2.zero;
+        rb.angularVelocity = 0f;
     }
 
     void Update()
     {
-        // Pausa lógica
         if (Mathf.Approximately(Time.timeScale, 0f)) return;
 
         if (listoParaMover && estaVivo)
@@ -45,9 +49,10 @@ public class Enemigo : MonoBehaviour
         waypoints = new List<Vector3>(puntos);
         indiceWaypoint = 0;
 
-        // Forzamos posición inicial con Z en 0
         Vector3 inicio = waypoints[0];
         inicio.z = 0;
+        
+        transform.position = inicio;
         rb.position = inicio;
 
         listoParaMover = true;
@@ -58,9 +63,9 @@ public class Enemigo : MonoBehaviour
 
     protected virtual void Mover()
     {
+        // Si ya llegamos al final o estamos muertos, no hacemos nada
         if (indiceWaypoint >= waypoints.Count || !estaVivo) return;
 
-        // IMPORTANTE: Ignoramos la Z del waypoint para el cálculo
         Vector3 puntoObjetivo = waypoints[indiceWaypoint];
         Vector2 objetivo2D = new Vector2(puntoObjetivo.x, puntoObjetivo.y);
         
@@ -68,7 +73,6 @@ public class Enemigo : MonoBehaviour
         Vector2 direccion = objetivo2D - posicionActual2D;
         float distancia = direccion.magnitude;
 
-        // Si estamos muy cerca del punto (margen de 0.1)
         if (distancia < 0.1f)
         {
             indiceWaypoint++;
@@ -82,8 +86,11 @@ public class Enemigo : MonoBehaviour
         else
         {
             float paso = velocidad * Time.deltaTime;
-            // Usamos MovePosition para un movimiento limpio en Kinematic
-            rb.MovePosition(posicionActual2D + direccion.normalized * Mathf.Min(paso, distancia));
+            // Solo movemos si seguimos vivos después del cálculo
+            if (estaVivo)
+            {
+                rb.MovePosition(posicionActual2D + direccion.normalized * Mathf.Min(paso, distancia));
+            }
         }
     }
 
@@ -91,8 +98,14 @@ public class Enemigo : MonoBehaviour
     {
         if (!estaVivo) return;
 
-        estaVivo = false; // Evitamos que procese más daño o movimiento
+        estaVivo = false; 
         listoParaMover = false;
+        
+        // Paramos cualquier movimiento físico residual
+        rb.velocity = Vector2.zero;
+
+        // Desactivamos el collider para que otros enemigos no lo empujen mientras muere
+        if (col != null) col.enabled = false;
 
         if (OnLlegadaFinal != null)
             OnLlegadaFinal.Invoke();
@@ -120,12 +133,18 @@ public class Enemigo : MonoBehaviour
 
     public void Morir(bool muertoPorJugador)
     {
+        // Aseguramos que todas las banderas de control estén apagadas
         estaVivo = false;
         listoParaMover = false;
+        
+        if (col != null) col.enabled = false;
+        rb.simulated = false; // Desactiva el Rigidbody por completo
 
         if (animator != null)
             animator.SetTrigger("Morir");
 
+        // Destruimos el objeto. 
+        // Si tienes una animación de muerte larga, puedes usar Destroy(gameObject, 1f);
         Destroy(gameObject);
     }
 }

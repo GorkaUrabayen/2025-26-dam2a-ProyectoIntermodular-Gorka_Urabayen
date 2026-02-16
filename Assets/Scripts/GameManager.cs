@@ -6,9 +6,14 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instancia;
 
-    [Header("Stats")]
-    public int vidas = 10;
-    public int dinero = 100;
+    [Header("Stats Iniciales")]
+    public int vidasIniciales = 10;
+    public int dineroInicial = 100;
+
+    [Header("Stats Actuales")]
+    public int vidas;
+    public int dinero;
+    public int enemigosRestantes = 0;
 
     [Header("UI")]
     public TMP_Text txtVidas;
@@ -23,8 +28,9 @@ public class GameManager : MonoBehaviour
         if (instancia == null)
         {
             instancia = this;
-            // Si quieres que el GameManager dure entre niveles, descomenta la siguiente línea:
-            // DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);
+            vidas = vidasIniciales;
+            dinero = dineroInicial;
         }
         else
         {
@@ -32,17 +38,40 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void Start()
+    void OnEnable() { SceneManager.sceneLoaded += AlCargarEscena; }
+    void OnDisable() { SceneManager.sceneLoaded -= AlCargarEscena; }
+
+    void AlCargarEscena(Scene escena, LoadSceneMode modo)
     {
-        ActualizarUI();
+        if (escena.name == "Nivel1")
+        {
+            vidas = vidasIniciales;
+            dinero = dineroInicial;
+        }
+
+        enemigosRestantes = 0;
+
+        // Buscamos la UI con un pequeño retraso para asegurar que los objetos existan
+        CancelInvoke("ReconectarUI"); 
+        Invoke("ReconectarUI", 0.1f);
+        
         ConfigurarCursor();
     }
 
-    public void ConfigurarCursor()
+    public void NotificarMuerteEnemigo()
     {
-        if (cursorSprite != null)
+        enemigosRestantes--;
+        if (enemigosRestantes <= 0)
         {
-            Cursor.SetCursor(cursorSprite, hotSpot, CursorMode.Auto);
+            Invoke("PasarAlSiguienteNivel", 2f);
+        }
+    }
+
+    public void PasarAlSiguienteNivel()
+    {
+        if (SceneManager.GetActiveScene().name == "Nivel1")
+        {
+            SceneManager.LoadScene("Nivel2");
         }
     }
 
@@ -50,22 +79,13 @@ public class GameManager : MonoBehaviour
     {
         vidas -= cantidad;
         if (vidas < 0) vidas = 0;
-
         ActualizarUI();
-
-        if (vidas <= 0)
-        {
-            CargarDerrota();
-        }
+        if (vidas <= 0) CargarDerrota();
     }
 
     void CargarDerrota()
     {
-        // Antes de ir a la escena de derrota, paramos la música del nivel
-        if (AudioManager.instancia != null)
-        {
-            AudioManager.instancia.DetenerMusicaYDestruir();
-        }
+        if (AudioManager.instancia != null) AudioManager.instancia.DetenerMusicaYDestruir();
         SceneManager.LoadScene("Derrota");
     }
 
@@ -88,10 +108,23 @@ public class GameManager : MonoBehaviour
 
     public void ActualizarUI()
     {
-        if (txtVidas != null)
-            txtVidas.text = "Vidas: " + vidas;
+        if (txtVidas != null) txtVidas.text = "Vidas: " + vidas;
+        if (txtDinero != null) txtDinero.text = "Dinero: " + dinero;
+    }
 
-        if (txtDinero != null)
-            txtDinero.text = "Dinero: " + dinero;
+    private void ReconectarUI()
+    {
+        GameObject objVidas = GameObject.Find("TextoVidas");
+        if (objVidas != null) txtVidas = objVidas.GetComponent<TMP_Text>();
+
+        GameObject objDinero = GameObject.Find("TextoDinero");
+        if (objDinero != null) txtDinero = objDinero.GetComponent<TMP_Text>();
+
+        ActualizarUI();
+    }
+
+    public void ConfigurarCursor()
+    {
+        if (cursorSprite != null) Cursor.SetCursor(cursorSprite, hotSpot, CursorMode.Auto);
     }
 }

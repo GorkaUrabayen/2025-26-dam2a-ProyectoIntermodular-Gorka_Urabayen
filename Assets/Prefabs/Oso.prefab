@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -3107462834693543172}
   - component: {fileID: 2968659570336438785}
   - component: {fileID: 1632311728041038586}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Oso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -225,7 +225,7 @@ GameObject:
   - component: {fileID: 7668250262017119726}
   - component: {fileID: 6865475549187667750}
   - component: {fileID: 29805711736992704}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: CuerpoVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -285,8 +285,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1765536329
-  m_SortingLayer: 3
+  m_SortingLayerID: -2126419815
+  m_SortingLayer: 4
   m_SortingOrder: 15
   m_Sprite: {fileID: -186141835, guid: 7c56086bb6bacc34cabd05e0aeb941ff, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

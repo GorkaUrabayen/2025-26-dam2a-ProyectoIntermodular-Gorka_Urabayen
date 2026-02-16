@@ -22,61 +22,50 @@ public class Enemigo : MonoBehaviour
     public Animator animator;
 
     protected Rigidbody2D rb;
-    private Collider2D col; // Referencia para desactivar colisiones
+    private Collider2D col; 
 
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
+        
         rb.bodyType = RigidbodyType2D.Kinematic;
-        // Aseguramos que no tenga fuerzas acumuladas
+        rb.simulated = true;
         rb.velocity = Vector2.zero;
-        rb.angularVelocity = 0f;
     }
 
     void Update()
     {
         if (Mathf.Approximately(Time.timeScale, 0f)) return;
-
-        if (listoParaMover && estaVivo)
-            Mover();
+        if (listoParaMover && estaVivo) Mover();
     }
 
     public void SetWaypoints(List<Vector3> puntos)
     {
         if (puntos == null || puntos.Count < 2) return;
-
         waypoints = new List<Vector3>(puntos);
         indiceWaypoint = 0;
-
         Vector3 inicio = waypoints[0];
         inicio.z = 0;
-        
         transform.position = inicio;
         rb.position = inicio;
-
         listoParaMover = true;
-
-        if (animator != null)
-            animator.SetBool("Caminando", true);
+        if (animator != null) animator.SetBool("Caminando", true);
     }
 
     protected virtual void Mover()
     {
-        // Si ya llegamos al final o estamos muertos, no hacemos nada
         if (indiceWaypoint >= waypoints.Count || !estaVivo) return;
 
         Vector3 puntoObjetivo = waypoints[indiceWaypoint];
         Vector2 objetivo2D = new Vector2(puntoObjetivo.x, puntoObjetivo.y);
-        
         Vector2 posicionActual2D = rb.position;
         Vector2 direccion = objetivo2D - posicionActual2D;
         float distancia = direccion.magnitude;
 
-        if (distancia < 0.1f)
+        if (distancia < 0.1f) // Aumentamos ligeramente el margen para evitar el "pasarse" de largo
         {
             indiceWaypoint++;
-
             if (indiceWaypoint >= waypoints.Count)
             {
                 LlegarAlFinal();
@@ -86,7 +75,6 @@ public class Enemigo : MonoBehaviour
         else
         {
             float paso = velocidad * Time.deltaTime;
-            // Solo movemos si seguimos vivos después del cálculo
             if (estaVivo)
             {
                 rb.MovePosition(posicionActual2D + direccion.normalized * Mathf.Min(paso, distancia));
@@ -98,13 +86,11 @@ public class Enemigo : MonoBehaviour
     {
         if (!estaVivo) return;
 
-        estaVivo = false; 
+        // --- PARADA DE EMERGENCIA ---
+        estaVivo = false;
         listoParaMover = false;
-        
-        // Paramos cualquier movimiento físico residual
         rb.velocity = Vector2.zero;
-
-        // Desactivamos el collider para que otros enemigos no lo empujen mientras muere
+        rb.simulated = false; // Esto evita que "rebote" o se mueva hacia atrás
         if (col != null) col.enabled = false;
 
         if (OnLlegadaFinal != null)
@@ -116,35 +102,39 @@ public class Enemigo : MonoBehaviour
     public void RecibirDanio(int cantidad)
     {
         if (!estaVivo) return;
-
         vida -= cantidad;
-
-        if (animator != null)
-            animator.SetTrigger("RecibirDanio");
+        if (animator != null) animator.SetTrigger("RecibirDanio");
 
         if (vida <= 0)
         {
             if (GameManager.instancia != null)
                 GameManager.instancia.GanarDinero(5);
-            
             Morir(true);
         }
     }
 
     public void Morir(bool muertoPorJugador)
     {
-        // Aseguramos que todas las banderas de control estén apagadas
+        // Si ya estaba muriendo por llegar al final, no repetimos la lógica
+        if (!estaVivo && muertoPorJugador) return; 
+
         estaVivo = false;
         listoParaMover = false;
-        
+        rb.simulated = false; // Desactivar física totalmente
         if (col != null) col.enabled = false;
-        rb.simulated = false; // Desactiva el Rigidbody por completo
+
+        if (GameManager.instancia != null)
+        {
+            GameManager.instancia.NotificarMuerteEnemigo();
+        }
 
         if (animator != null)
+        {
+            animator.SetBool("Caminando", false);
             animator.SetTrigger("Morir");
+        }
 
-        // Destruimos el objeto. 
-        // Si tienes una animación de muerte larga, puedes usar Destroy(gameObject, 1f);
+        // Destruir inmediatamente para que no haya restos visuales moviéndose
         Destroy(gameObject);
     }
 }

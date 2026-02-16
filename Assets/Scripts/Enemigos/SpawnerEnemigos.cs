@@ -37,6 +37,12 @@ public class SpawnerEnemigos : MonoBehaviour
         }
 
         waypoints = new List<Vector3>(mapaScript.waypoints);
+
+        if (GameManager.instancia != null)
+        {
+            GameManager.instancia.enemigosRestantes = numeroOleadas * enemigosPorOleada;
+        }
+
         StartCoroutine(IniciarOleadas());
     }
 
@@ -60,30 +66,29 @@ public class SpawnerEnemigos : MonoBehaviour
         }
     }
 
-   void GenerarEnemigo()
-{
-    if (mapaScript == null || mapaScript.waypoints == null || mapaScript.waypoints.Count < 2) return;
-
-    GameObject prefabAElegir = prefabEnemigoBase;
-    if (oleadaActual >= oleadaMinimaParaExtra && prefabsExtra.Count > 0)
+    void GenerarEnemigo()
     {
-        int index = Random.Range(0, prefabsExtra.Count + 1);
-        if (index < prefabsExtra.Count) prefabAElegir = prefabsExtra[index];
+        if (mapaScript == null || mapaScript.waypoints == null || mapaScript.waypoints.Count < 2) return;
+
+        GameObject prefabAElegir = prefabEnemigoBase;
+        if (oleadaActual >= oleadaMinimaParaExtra && prefabsExtra.Count > 0)
+        {
+            int index = Random.Range(0, prefabsExtra.Count + 1);
+            if (index < prefabsExtra.Count) prefabAElegir = prefabsExtra[index];
+        }
+
+        Vector3 spawnPos = waypoints[0];
+        spawnPos.z = 0f; 
+
+        GameObject nuevoEnemigo = Instantiate(prefabAElegir, spawnPos, Quaternion.identity);
+
+        Enemigo enemigoScript = nuevoEnemigo.GetComponent<Enemigo>();
+        if (enemigoScript != null)
+        {
+            enemigoScript.SetWaypoints(new List<Vector3>(waypoints));
+            enemigoScript.OnLlegadaFinal += EnemigoLlegadoAlFinal;
+        }
     }
-
-    // Usamos el primer waypoint pero forzamos Z = 0 para no liarnos con la física
-    Vector3 spawnPos = waypoints[0];
-    spawnPos.z = 0f; 
-
-    GameObject nuevoEnemigo = Instantiate(prefabAElegir, spawnPos, Quaternion.identity);
-
-    Enemigo enemigoScript = nuevoEnemigo.GetComponent<Enemigo>();
-    if (enemigoScript != null)
-    {
-        enemigoScript.SetWaypoints(new List<Vector3>(waypoints));
-        enemigoScript.OnLlegadaFinal += EnemigoLlegadoAlFinal;
-    }
-}
 
     void EnemigoLlegadoAlFinal()
     {

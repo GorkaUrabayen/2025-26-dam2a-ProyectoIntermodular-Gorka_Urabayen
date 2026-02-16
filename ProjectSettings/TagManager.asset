@@ -14,7 +14,7 @@ TagManager:
   - UI
   - Suelo
   - Unidades
-  - 
+  - Enemigo
   - 
   - 
   - 
@@ -50,6 +50,9 @@ TagManager:
     locked: 0
   - name: Unidades
     uniqueID: 1765536329
+    locked: 0
+  - name: Enemigo
+    uniqueID: 2168547481
     locked: 0
   - name: UI
     uniqueID: 1330907691

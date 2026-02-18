@@ -257,8 +257,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d4f2dd9acb094043912adc8fd1f7f8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vidasIniciales: 10
-  dineroInicial: 30
   vidas: 10
   dinero: 30
   enemigosRestantes: 0
@@ -984,7 +982,7 @@ GameObject:
   - component: {fileID: 430511179}
   - component: {fileID: 430511178}
   m_Layer: 5
-  m_Name: 'TextoDinero '
+  m_Name: TextoDinero
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1337,7 +1335,7 @@ GameObject:
   - component: {fileID: 1174735709}
   - component: {fileID: 1174735708}
   m_Layer: 5
-  m_Name: 'TextoVidas '
+  m_Name: TextoVidas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

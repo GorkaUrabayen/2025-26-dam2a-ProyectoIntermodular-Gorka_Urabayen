@@ -259,7 +259,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vidas: 10
-  dinero: 30
+  dinero: 60
   enemigosRestantes: 0
   txtVidas: {fileID: 1174735708}
   txtDinero: {fileID: 430511178}
@@ -742,7 +742,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f16e265303d59dc47926b9c7945f670e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabEnemigoBase: {fileID: 4679007936719127254, guid: 863501441adc7b14aba8e4af215384ff, type: 3}
+  prefabEnemigoBase: {fileID: 4679007936719127254, guid: 47a41db797ac39146939d9869d0286f9, type: 3}
   prefabsExtra:
   - {fileID: 4679007936719127254, guid: 1ae43c6068eba3f409c523ed2c741e78, type: 3}
   - {fileID: 4679007936719127254, guid: 863501441adc7b14aba8e4af215384ff, type: 3}
@@ -1151,7 +1151,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d3ab5c076685f04c88f020822a6eee3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabArquero: {fileID: 6951866107963330049, guid: 01c0b473dcc57f24c82eae05f39bb3f1, type: 3}
+  prefabArqueroNormal: {fileID: 6951866107963330049, guid: 01c0b473dcc57f24c82eae05f39bb3f1, type: 3}
+  prefabArqueroRojo: {fileID: 6951866107963330049, guid: 56b18fa2c9643be4c935d01c9688c600, type: 3}
   generadorMapa: {fileID: 199372658}
   correccionVisual: {x: 0, y: -0.5}
   forzarCentroRejilla: 1
@@ -1659,7 +1660,7 @@ GameObject:
   - component: {fileID: 1298952610}
   - component: {fileID: 1298952609}
   m_Layer: 5
-  m_Name: Torre2
+  m_Name: Torre
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1732,7 +1733,7 @@ MonoBehaviour:
       - m_Target: {fileID: 456512152}
         m_TargetAssemblyTypeName: GestorTorres, Assembly-CSharp
         m_MethodName: EmpezarColocacion
-        m_Mode: 1
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2982,11 +2983,11 @@ MonoBehaviour:
       - m_Target: {fileID: 456512152}
         m_TargetAssemblyTypeName: GestorTorres, Assembly-CSharp
         m_MethodName: EmpezarColocacion
-        m_Mode: 1
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -3139,7 +3140,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Archer
+  m_text: 'Red
+
+    Archer '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

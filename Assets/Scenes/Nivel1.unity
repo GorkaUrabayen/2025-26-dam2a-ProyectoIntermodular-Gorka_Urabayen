@@ -1149,7 +1149,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d3ab5c076685f04c88f020822a6eee3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabArquero: {fileID: 6951866107963330049, guid: 01c0b473dcc57f24c82eae05f39bb3f1, type: 3}
+  prefabArqueroNormal: {fileID: 6951866107963330049, guid: 01c0b473dcc57f24c82eae05f39bb3f1, type: 3}
+  prefabArqueroRojo: {fileID: 6951866107963330049, guid: 56b18fa2c9643be4c935d01c9688c600, type: 3}
   generadorMapa: {fileID: 199372658}
   correccionVisual: {x: 0, y: -0.5}
   forzarCentroRejilla: 1
@@ -1730,7 +1731,7 @@ MonoBehaviour:
       - m_Target: {fileID: 456512152}
         m_TargetAssemblyTypeName: GestorTorres, Assembly-CSharp
         m_MethodName: EmpezarColocacion
-        m_Mode: 1
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

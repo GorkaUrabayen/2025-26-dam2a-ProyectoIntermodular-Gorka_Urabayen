@@ -40,10 +40,14 @@ public class GameManager : MonoBehaviour
     void AlCargarEscena(Scene escena, LoadSceneMode modo)
     {
         // 1. Resetear Stats según el nivel
-        if (escena.name == "Nivel1" || escena.name == "Nivel2")
+        if (escena.name == "Nivel1" )
         {
             vidas = 10;
             dinero = 30;
+        }else if(escena.name == "Nivel2")
+        {
+            vidas =10;
+            dinero =60;
         }
 
         enemigosRestantes = 0;

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Arquero : Torre
 {
-    protected void Awake()
+    protected virtual void Awake()
     {
         alcance = 3f;
         coste = 30;

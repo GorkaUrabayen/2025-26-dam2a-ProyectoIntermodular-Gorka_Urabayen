@@ -14,6 +14,10 @@ public class Enemigo : MonoBehaviour
     [Header("Vida")]
     public int vida = 10;
     private bool estaVivo = true;
+    public int recompensa = 5; // Valor por defecto
+
+    [Header("Visual")]
+    public SpriteRenderer spriteRenderer; // Arrastra aquí el CuerpoVisual en el Inspector
 
     public delegate void LlegadaFinal();
     public event LlegadaFinal OnLlegadaFinal;
@@ -29,9 +33,11 @@ public class Enemigo : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         
+        // Si no asignaste el spriteRenderer en el Inspector, intentamos buscarlo en los hijos
+        if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.simulated = true;
-        rb.velocity = Vector2.zero;
     }
 
     void Update()
@@ -40,6 +46,37 @@ public class Enemigo : MonoBehaviour
         if (listoParaMover && estaVivo) Mover();
     }
 
+    // --- LÓGICA DE COLOR ---
+    public void RecibirDanio(int cantidad)
+    {
+        if (!estaVivo) return;
+        vida -= cantidad;
+        
+        // Feedback Visual: Rojo
+        StopAllCoroutines(); // Detiene parpadeos anteriores si le pegan rápido
+        StartCoroutine(FeedbackDanio());
+
+        if (animator != null) animator.SetTrigger("RecibirDanio");
+
+        if (vida <= 0)
+        {
+            if (GameManager.instancia != null)
+                GameManager.instancia.GanarDinero(recompensa); // Usamos la variable personalizada
+            Morir(true);
+        }
+    }
+
+    IEnumerator FeedbackDanio()
+    {
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = Color.red;
+            yield return new WaitForSeconds(0.2f); // 0.2s es suficiente para un "flash", 1s puede ser mucho
+            spriteRenderer.color = Color.white;
+        }
+    }
+
+    // --- RESTO DEL CÓDIGO (Igual que antes) ---
     public void SetWaypoints(List<Vector3> puntos)
     {
         if (puntos == null || puntos.Count < 2) return;
@@ -56,85 +93,44 @@ public class Enemigo : MonoBehaviour
     protected virtual void Mover()
     {
         if (indiceWaypoint >= waypoints.Count || !estaVivo) return;
-
         Vector3 puntoObjetivo = waypoints[indiceWaypoint];
         Vector2 objetivo2D = new Vector2(puntoObjetivo.x, puntoObjetivo.y);
         Vector2 posicionActual2D = rb.position;
         Vector2 direccion = objetivo2D - posicionActual2D;
         float distancia = direccion.magnitude;
 
-        if (distancia < 0.1f) // Aumentamos ligeramente el margen para evitar el "pasarse" de largo
+        if (distancia < 0.1f)
         {
             indiceWaypoint++;
-            if (indiceWaypoint >= waypoints.Count)
-            {
-                LlegarAlFinal();
-                return;
-            }
+            if (indiceWaypoint >= waypoints.Count) { LlegarAlFinal(); return; }
         }
         else
         {
             float paso = velocidad * Time.deltaTime;
-            if (estaVivo)
-            {
-                rb.MovePosition(posicionActual2D + direccion.normalized * Mathf.Min(paso, distancia));
-            }
+            rb.MovePosition(posicionActual2D + direccion.normalized * Mathf.Min(paso, distancia));
         }
     }
 
     private void LlegarAlFinal()
     {
         if (!estaVivo) return;
-
-        // --- PARADA DE EMERGENCIA ---
         estaVivo = false;
         listoParaMover = false;
-        rb.velocity = Vector2.zero;
-        rb.simulated = false; // Esto evita que "rebote" o se mueva hacia atrás
+        rb.simulated = false; 
         if (col != null) col.enabled = false;
-
-        if (OnLlegadaFinal != null)
-            OnLlegadaFinal.Invoke();
-
+        if (OnLlegadaFinal != null) OnLlegadaFinal.Invoke();
         Morir(false);
-    }
-
-    public void RecibirDanio(int cantidad)
-    {
-        if (!estaVivo) return;
-        vida -= cantidad;
-        if (animator != null) animator.SetTrigger("RecibirDanio");
-
-        if (vida <= 0)
-        {
-            if (GameManager.instancia != null)
-                GameManager.instancia.GanarDinero(5);
-            Morir(true);
-        }
     }
 
     public void Morir(bool muertoPorJugador)
     {
-        // Si ya estaba muriendo por llegar al final, no repetimos la lógica
         if (!estaVivo && muertoPorJugador) return; 
-
         estaVivo = false;
         listoParaMover = false;
-        rb.simulated = false; // Desactivar física totalmente
+        rb.simulated = false;
         if (col != null) col.enabled = false;
-
-        if (GameManager.instancia != null)
-        {
-            GameManager.instancia.NotificarMuerteEnemigo();
-        }
-
-        if (animator != null)
-        {
-            animator.SetBool("Caminando", false);
-            animator.SetTrigger("Morir");
-        }
-
-        // Destruir inmediatamente para que no haya restos visuales moviéndose
+        if (GameManager.instancia != null) GameManager.instancia.NotificarMuerteEnemigo();
+        if (animator != null) { animator.SetBool("Caminando", false); animator.SetTrigger("Morir"); }
         Destroy(gameObject);
     }
 }

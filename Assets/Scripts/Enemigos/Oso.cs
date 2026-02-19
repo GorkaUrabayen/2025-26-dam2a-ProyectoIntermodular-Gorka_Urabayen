@@ -1,6 +1,3 @@
-using UnityEngine;
-using System.Collections.Generic;
-
 public class Oso : Enemigo 
 {
     protected override void Awake()
@@ -8,6 +5,6 @@ public class Oso : Enemigo
         base.Awake(); 
         velocidad = 5f; 
         vida = 40;
+        recompensa = 20; // Dinero Oso
     }
-    
 }

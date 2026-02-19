@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class Skull : Enemigo
 {
     protected override void Awake()
@@ -7,5 +5,6 @@ public class Skull : Enemigo
         base.Awake();
         velocidad = 10f;
         vida = 6;
+        recompensa = 10; // Dinero Skull
     }
 }

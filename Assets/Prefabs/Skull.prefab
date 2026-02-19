@@ -270,8 +270,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3844cefc368f8c46af726c9254fb1ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidad: 2
+  velocidad: 0.5
   vida: 6
+  recompensa: 10
+  spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
 --- !u!114 &1410024272625821651
 MonoBehaviour:
@@ -287,4 +289,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   velocidad: 2
   vida: 10
+  recompensa: 5
+  spriteRenderer: {fileID: 0}
   animator: {fileID: 0}

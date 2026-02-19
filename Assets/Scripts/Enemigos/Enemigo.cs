@@ -111,16 +111,26 @@ public class Enemigo : MonoBehaviour
         }
     }
 
-    private void LlegarAlFinal()
-    {
-        if (!estaVivo) return;
-        estaVivo = false;
-        listoParaMover = false;
-        rb.simulated = false; 
-        if (col != null) col.enabled = false;
-        if (OnLlegadaFinal != null) OnLlegadaFinal.Invoke();
-        Morir(false);
-    }
+   private void LlegarAlFinal()
+{
+    if (!estaVivo) return;
+
+    // --- CORRECCIÓN: DETENCIÓN INMEDIATA ---
+    estaVivo = false;
+    listoParaMover = false;
+    
+    // Anulamos cualquier velocidad residual y movimiento
+    rb.velocity = Vector2.zero;
+    rb.isKinematic = true; // Forzamos a que deje de responder a físicas
+    rb.simulated = false;  // Lo sacamos del motor de física inmediatamente
+
+    if (col != null) col.enabled = false;
+    
+    // Lanzamos el evento de daño al jugador antes de destruir
+    if (OnLlegadaFinal != null) OnLlegadaFinal.Invoke();
+
+    Morir(false);
+}
 
     public void Morir(bool muertoPorJugador)
     {

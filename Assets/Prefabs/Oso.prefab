@@ -198,6 +198,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   velocidad: 2
   vida: 10
+  recompensa: 5
+  spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
 --- !u!114 &1632311728041038586
 MonoBehaviour:
@@ -211,8 +213,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0ad5248012345e458019dbd91250954, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidad: 2
+  velocidad: 0.1
   vida: 10
+  recompensa: 20
+  spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
 --- !u!1 &9120543212659620710
 GameObject:

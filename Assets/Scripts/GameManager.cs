@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using UnityEngine.UI; // Necesario para detectar los botones
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,14 +16,16 @@ public class GameManager : MonoBehaviour
     [Header("UI References (Se buscan solas)")]
     public TMP_Text txtVidas;
     public TMP_Text txtDinero;
+    public GameObject panelPausa; // NUEVO: Para guardar el menú de pausa
 
     [Header("Cursor Settings")]
     public Texture2D cursorSprite;
     public Vector2 hotSpot = Vector2.zero;
 
+    private bool juegoPausado = false; // NUEVO: Control de estado
+
     void Awake()
     {
-        // Sistema Singleton: mantiene el primer GameManager y destruye los nuevos al recargar escena
         if (instancia == null)
         {
             instancia = this;
@@ -38,12 +40,41 @@ public class GameManager : MonoBehaviour
     void OnEnable() { SceneManager.sceneLoaded += AlCargarEscena; }
     void OnDisable() { SceneManager.sceneLoaded -= AlCargarEscena; }
 
+    // NUEVO: Detectar la tecla Espacio en cada frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            // Solo pausar si no estamos en el menú principal
+            if (SceneManager.GetActiveScene().name != "EscenaInicio")
+            {
+                AlternarPausa();
+            }
+        }
+    }
+
+    // NUEVO: Función para pausar/reanudar
+    public void AlternarPausa()
+    {
+        juegoPausado = !juegoPausado;
+
+        if (juegoPausado)
+        {
+            Time.timeScale = 0f; // Congela el juego
+            if (panelPausa != null) panelPausa.SetActive(true);
+        }
+        else
+        {
+            Time.timeScale = 1f; // Descongela el juego
+            if (panelPausa != null) panelPausa.SetActive(false);
+        }
+    }
+
     void AlCargarEscena(Scene escena, LoadSceneMode modo)
     {
-        // IMPORTANTE: Siempre reanudar el tiempo al cargar
         Time.timeScale = 1f; 
+        juegoPausado = false; // Resetear estado de pausa al cambiar nivel
 
-        // 1. Resetear Stats según el nivel
         if (escena.name == "Nivel1")
         {
             vidas = 10;
@@ -56,30 +87,26 @@ public class GameManager : MonoBehaviour
         }
 
         enemigosRestantes = 0;
-
-        // 2. Limpiar referencias viejas para que no den error
         txtVidas = null;
         txtDinero = null;
+        panelPausa = null; // Limpiar referencia vieja
 
-        // 3. Buscar la nueva UI de la escena cargada
         StartCoroutine(BuscarUIPorPasos());
         ConfigurarCursor();
     }
 
     IEnumerator BuscarUIPorPasos()
     {
-        // Esperamos a que Unity termine de renderizar el primer frame
         yield return new WaitForEndOfFrame();
         ReconectarUI();
 
-        // Reintento de seguridad por si la escena tarda en cargar
         yield return new WaitForSeconds(0.1f);
         if (txtVidas == null || txtDinero == null) ReconectarUI();
     }
 
     private void ReconectarUI()
     {
-        // A. Conectar Textos de Vidas y Dinero
+        // Conectar Textos
         TMP_Text[] todosLosTextos = FindObjectsOfType<TMP_Text>(true);
         foreach (TMP_Text t in todosLosTextos)
         {
@@ -87,14 +114,21 @@ public class GameManager : MonoBehaviour
             if (t.gameObject.name == "TextoDinero") txtDinero = t;
         }
 
-        // B. Conectar Botones automáticamente por Nombre
+        // NUEVO: Buscar el Panel de Pausa automáticamente
+        // Asegúrate de que tu objeto de UI de pausa se llame exactamente "MenuPausa"
+        GameObject buscado = GameObject.Find("MenuPausa");
+        if (buscado != null) 
+        {
+            panelPausa = buscado;
+            panelPausa.SetActive(false); // Empezar oculto
+        }
+
+        // Conectar Botones
         Button[] todosLosBotones = FindObjectsOfType<Button>(true);
         foreach (Button btn in todosLosBotones)
         {
-            // Limpiamos referencias muertas del Inspector
             btn.onClick.RemoveAllListeners();
 
-            // Asignamos la función según el nombre que tenga el botón en la Hierarchy
             if (btn.gameObject.name == "Reiniciar") 
                 btn.onClick.AddListener(() => ReiniciarNivel());
             
@@ -103,6 +137,10 @@ public class GameManager : MonoBehaviour
 
             if (btn.gameObject.name == "Salir") 
                 btn.onClick.AddListener(() => SalirDelJuego());
+
+            // NUEVO: Botón para volver al juego desde el menú de pausa
+            if (btn.gameObject.name == "Reanudar")
+                btn.onClick.AddListener(() => AlternarPausa());
         }
 
         ActualizarUI();
@@ -113,8 +151,6 @@ public class GameManager : MonoBehaviour
         if (txtVidas != null) txtVidas.text = "Vidas: " + vidas;
         if (txtDinero != null) txtDinero.text = "Dinero: " + dinero;
     }
-
-    // --- LÓGICA DE JUEGO ---
 
     public void NotificarMuerteEnemigo()
     {
@@ -162,8 +198,6 @@ public class GameManager : MonoBehaviour
         if (cursorSprite != null) Cursor.SetCursor(cursorSprite, hotSpot, CursorMode.Auto);
     }
 
-    // --- MÉTODOS DE NAVEGACIÓN ---
-
     public void ReiniciarNivel()
     {
         Time.timeScale = 1f; 
@@ -174,7 +208,6 @@ public class GameManager : MonoBehaviour
     public void VolverAlMenu()
     {
         Time.timeScale = 1f; 
-        // Cambiado a "EscenaInicial" para coincidir con tu carpeta de Assets
         SceneManager.LoadScene("EscenaInicio");
     }
 

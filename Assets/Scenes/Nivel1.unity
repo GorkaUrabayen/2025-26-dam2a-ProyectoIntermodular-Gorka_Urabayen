@@ -396,6 +396,7 @@ MonoBehaviour:
   enemigosRestantes: 0
   txtVidas: {fileID: 1174735708}
   txtDinero: {fileID: 430511178}
+  panelPausa: {fileID: 0}
   cursorSprite: {fileID: 2800000, guid: fe26d2ed460e4944e9bd45b977856d74, type: 3}
   hotSpot: {x: 0, y: 0}
 --- !u!4 &142507664
@@ -3395,9 +3396,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de41258c8a852174c908211896b5d222, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  source: {fileID: 0}
-  esMusicaDeMenu: 0
-  esEscenaOpciones: 0
+  musicaSource: {fileID: 1773265514}
+  musicaMenu: {fileID: 8300000, guid: 559be67cd1673a648a8936e6b4863e6e, type: 3}
+  musicaNivel: {fileID: 8300000, guid: bb05b69a4782c384fa58cb56c32e4e7d, type: 3}
+  musicaVictoria: {fileID: 8300000, guid: a6e3ee3c67316d24bb20f25aa0553f5d, type: 3}
+  musicaDerrota: {fileID: 8300000, guid: 941006cb5a932574b9c6cb28882b364b, type: 3}
 --- !u!82 &1773265514
 AudioSource:
   m_ObjectHideFlags: 0

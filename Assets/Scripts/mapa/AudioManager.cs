@@ -3,11 +3,15 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager instancia;
-    public AudioSource source;
 
-    [Header("Configuracion de Escena")]
-    public bool esMusicaDeMenu = false;
-    public bool esEscenaOpciones = false; 
+    [Header("Configuración de Audio")]
+    public AudioSource musicaSource;
+
+    [Header("Clips de Música")]
+    public AudioClip musicaMenu;
+    public AudioClip musicaNivel;
+    public AudioClip musicaVictoria;
+    public AudioClip musicaDerrota;
 
     void Awake()
     {
@@ -15,41 +19,42 @@ public class AudioManager : MonoBehaviour
         {
             instancia = this;
             DontDestroyOnLoad(gameObject);
-            source = GetComponent<AudioSource>();
             
-            // Aplicar volumen guardado al iniciar
-            ActualizarVolumen(PlayerPrefs.GetFloat("VolumenMaster", 0.5f));
+            // Si no asignaste un AudioSource, intenta buscar uno en el objeto
+            if (musicaSource == null) musicaSource = GetComponent<AudioSource>();
         }
         else
         {
-            // SI ESTAMOS EN OPCIONES: No tocamos nada, dejamos que siga la música que ya suena
-            if (esEscenaOpciones)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            // CAMBIO DE MÚSICA: De Menú a Nivel (o viceversa)
-            if (esMusicaDeMenu != instancia.esMusicaDeMenu)
-            {
-                instancia.source.clip = GetComponent<AudioSource>().clip;
-                instancia.source.Play();
-                instancia.esMusicaDeMenu = esMusicaDeMenu;
-            }
-            
             Destroy(gameObject);
         }
     }
 
-    public void ActualizarVolumen(float nuevoVolumen)
+    // --- Métodos que llama el GameManager ---
+
+    public void PlayMusicaMenu() => CambiarMusica(musicaMenu, true);
+    
+    public void PlayMusicaNivel() => CambiarMusica(musicaNivel, true);
+    
+    public void PlayMusicaVictoria() => CambiarMusica(musicaVictoria, false);
+    
+    public void PlayMusicaDerrota() => CambiarMusica(musicaDerrota, false);
+
+    // Función interna para evitar repetir código
+    private void CambiarMusica(AudioClip clip, bool loop)
     {
-        if (source == null) source = GetComponent<AudioSource>();
-        source.volume = nuevoVolumen;
+        if (musicaSource == null || clip == null) return;
+
+        // Si ya está sonando ese clip, no lo reinicies
+        if (musicaSource.clip == clip) return;
+
+        musicaSource.Stop();
+        musicaSource.clip = clip;
+        musicaSource.loop = loop;
+        musicaSource.Play();
     }
 
-    public void DetenerMusicaYDestruir()
+    public void ActualizarVolumen(float volumen)
     {
-        if (source != null) source.Stop();
-        Destroy(gameObject);
+        if (musicaSource != null) musicaSource.volume = volumen;
     }
 }

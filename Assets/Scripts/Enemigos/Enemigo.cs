@@ -91,25 +91,41 @@ public class Enemigo : MonoBehaviour
     }
 
     protected virtual void Mover()
-    {
-        if (indiceWaypoint >= waypoints.Count || !estaVivo) return;
-        Vector3 puntoObjetivo = waypoints[indiceWaypoint];
-        Vector2 objetivo2D = new Vector2(puntoObjetivo.x, puntoObjetivo.y);
-        Vector2 posicionActual2D = rb.position;
-        Vector2 direccion = objetivo2D - posicionActual2D;
-        float distancia = direccion.magnitude;
+{
+    // Si ya no debe moverse o el índice es inválido, salimos
+    if (!estaVivo || !listoParaMover || waypoints == null || indiceWaypoint >= waypoints.Count) 
+        return;
 
-        if (distancia < 0.1f)
+    Vector3 puntoObjetivo = waypoints[indiceWaypoint];
+    Vector2 objetivo2D = new Vector2(puntoObjetivo.x, puntoObjetivo.y);
+    Vector2 posicionActual2D = rb.position;
+    
+    Vector2 direccion = objetivo2D - posicionActual2D;
+    float distancia = direccion.magnitude;
+
+    // Si estamos muy cerca del punto actual, pasamos al siguiente
+    if (distancia < 0.15f) // Aumentamos un poco el margen de error
+    {
+        indiceWaypoint++;
+        
+        // --- CAMBIO CLAVE: Si ya no hay más puntos, MORIR YA ---
+        if (indiceWaypoint >= waypoints.Count) 
         {
-            indiceWaypoint++;
-            if (indiceWaypoint >= waypoints.Count) { LlegarAlFinal(); return; }
-        }
-        else
-        {
-            float paso = velocidad * Time.deltaTime;
-            rb.MovePosition(posicionActual2D + direccion.normalized * Mathf.Min(paso, distancia));
+            LlegarAlFinal();
+            return;
         }
     }
+    else
+    {
+        // Moverse hacia el objetivo
+        float paso = velocidad * Time.deltaTime;
+        rb.MovePosition(posicionActual2D + direccion.normalized * Mathf.Min(paso, distancia));
+        
+        // Rotación opcional: Mirar hacia la dirección del movimiento
+        if (direccion.x > 0.1f) transform.localScale = new Vector3(1, 1, 1);
+        else if (direccion.x < -0.1f) transform.localScale = new Vector3(-1, 1, 1);
+    }
+}
 
    private void LlegarAlFinal()
 {

@@ -792,7 +792,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de41258c8a852174c908211896b5d222, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  esMusicaDeMenu: 1
+  musicaSource: {fileID: 754199508}
+  musicaMenu: {fileID: 8300000, guid: 559be67cd1673a648a8936e6b4863e6e, type: 3}
+  musicaNivel: {fileID: 8300000, guid: bb05b69a4782c384fa58cb56c32e4e7d, type: 3}
+  musicaVictoria: {fileID: 8300000, guid: a6e3ee3c67316d24bb20f25aa0553f5d, type: 3}
+  musicaDerrota: {fileID: 8300000, guid: 941006cb5a932574b9c6cb28882b364b, type: 3}
 --- !u!1 &833486761
 GameObject:
   m_ObjectHideFlags: 0

@@ -767,7 +767,7 @@ GameObject:
   - component: {fileID: 950846426}
   - component: {fileID: 950846425}
   m_Layer: 0
-  m_Name: AudioInicio
+  m_Name: AudioDerrota
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -782,9 +782,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 950846424}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ea46e748484a3343af04fb04362ac8e, type: 3}
+  m_Script: {fileID: 11500000, guid: de41258c8a852174c908211896b5d222, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  musicaSource: {fileID: 950846426}
+  musicaMenu: {fileID: 8300000, guid: 559be67cd1673a648a8936e6b4863e6e, type: 3}
+  musicaNivel: {fileID: 8300000, guid: bb05b69a4782c384fa58cb56c32e4e7d, type: 3}
+  musicaVictoria: {fileID: 8300000, guid: a6e3ee3c67316d24bb20f25aa0553f5d, type: 3}
+  musicaDerrota: {fileID: 8300000, guid: 941006cb5a932574b9c6cb28882b364b, type: 3}
 --- !u!82 &950846426
 AudioSource:
   m_ObjectHideFlags: 0
@@ -797,7 +802,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 941006cb5a932574b9c6cb28882b364b, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.308
+  m_Volume: 0.676
   m_Pitch: 1
   Loop: 1
   Mute: 0

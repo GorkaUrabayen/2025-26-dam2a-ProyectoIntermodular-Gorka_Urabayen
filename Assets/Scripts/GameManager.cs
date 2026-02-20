@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using UnityEngine.UI; // Necesario para detectar los botones
 
 public class GameManager : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        // Sistema Singleton para que el GameManager no se destruya
+        // Sistema Singleton: mantiene el primer GameManager y destruye los nuevos al recargar escena
         if (instancia == null)
         {
             instancia = this;
@@ -39,40 +40,81 @@ public class GameManager : MonoBehaviour
 
     void AlCargarEscena(Scene escena, LoadSceneMode modo)
     {
+        // IMPORTANTE: Siempre reanudar el tiempo al cargar
+        Time.timeScale = 1f; 
+
         // 1. Resetear Stats según el nivel
-        if (escena.name == "Nivel1" )
+        if (escena.name == "Nivel1")
         {
             vidas = 10;
             dinero = 30;
-        }else if(escena.name == "Nivel2")
+        }
+        else if (escena.name == "Nivel2")
         {
-            vidas =10;
-            dinero =60;
+            vidas = 10;
+            dinero = 60;
         }
 
         enemigosRestantes = 0;
 
-        // 2. Limpiar referencias viejas (OBLIGATORIO para cambiar de escena)
+        // 2. Limpiar referencias viejas para que no den error
         txtVidas = null;
         txtDinero = null;
 
-        // 3. Buscar los nuevos textos de esta escena
-        // Usamos una Corrutina para esperar un instante a que Unity despierte los objetos de la UI
+        // 3. Buscar la nueva UI de la escena cargada
         StartCoroutine(BuscarUIPorPasos());
-        
         ConfigurarCursor();
     }
 
     IEnumerator BuscarUIPorPasos()
     {
-        // Esperamos un frame para que los objetos de la jerarquía existan
+        // Esperamos a que Unity termine de renderizar el primer frame
         yield return new WaitForEndOfFrame();
         ReconectarUI();
 
-        // Por si acaso la escena es pesada, reintentamos a la décima de segundo
+        // Reintento de seguridad por si la escena tarda en cargar
         yield return new WaitForSeconds(0.1f);
         if (txtVidas == null || txtDinero == null) ReconectarUI();
     }
+
+    private void ReconectarUI()
+    {
+        // A. Conectar Textos de Vidas y Dinero
+        TMP_Text[] todosLosTextos = FindObjectsOfType<TMP_Text>(true);
+        foreach (TMP_Text t in todosLosTextos)
+        {
+            if (t.gameObject.name == "TextoVidas") txtVidas = t;
+            if (t.gameObject.name == "TextoDinero") txtDinero = t;
+        }
+
+        // B. Conectar Botones automáticamente por Nombre
+        Button[] todosLosBotones = FindObjectsOfType<Button>(true);
+        foreach (Button btn in todosLosBotones)
+        {
+            // Limpiamos referencias muertas del Inspector
+            btn.onClick.RemoveAllListeners();
+
+            // Asignamos la función según el nombre que tenga el botón en la Hierarchy
+            if (btn.gameObject.name == "Reiniciar") 
+                btn.onClick.AddListener(() => ReiniciarNivel());
+            
+            if (btn.gameObject.name == "Volver al menu") 
+                btn.onClick.AddListener(() => VolverAlMenu());
+
+            if (btn.gameObject.name == "Salir") 
+                btn.onClick.AddListener(() => SalirDelJuego());
+        }
+
+        ActualizarUI();
+    }
+
+    public void ActualizarUI()
+    {
+        if (txtVidas != null) txtVidas.text = "Vidas: " + vidas;
+        if (txtDinero != null) txtDinero.text = "Dinero: " + dinero;
+    }
+
+    // --- LÓGICA DE JUEGO ---
 
     public void NotificarMuerteEnemigo()
     {
@@ -115,28 +157,30 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public void ActualizarUI()
-    {
-        if (txtVidas != null) txtVidas.text = "Vidas: " + vidas;
-        if (txtDinero != null) txtDinero.text = "Dinero: " + dinero;
-    }
-
-    private void ReconectarUI()
-    {
-        // Buscamos todos los TMP_Text de la escena actual (incluyendo desactivados)
-        TMP_Text[] todosLosTextos = FindObjectsOfType<TMP_Text>(true);
-        
-        foreach (TMP_Text t in todosLosTextos)
-        {
-            if (t.gameObject.name == "TextoVidas") txtVidas = t;
-            if (t.gameObject.name == "TextoDinero") txtDinero = t;
-        }
-
-        ActualizarUI();
-    }
-
     public void ConfigurarCursor()
     {
         if (cursorSprite != null) Cursor.SetCursor(cursorSprite, hotSpot, CursorMode.Auto);
+    }
+
+    // --- MÉTODOS DE NAVEGACIÓN ---
+
+    public void ReiniciarNivel()
+    {
+        Time.timeScale = 1f; 
+        string nombreEscenaActual = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(nombreEscenaActual);
+    }
+
+    public void VolverAlMenu()
+    {
+        Time.timeScale = 1f; 
+        // Cambiado a "EscenaInicial" para coincidir con tu carpeta de Assets
+        SceneManager.LoadScene("EscenaInicio");
+    }
+
+    public void SalirDelJuego()
+    {
+        Application.Quit();
+        Debug.Log("Saliendo del juego...");
     }
 }

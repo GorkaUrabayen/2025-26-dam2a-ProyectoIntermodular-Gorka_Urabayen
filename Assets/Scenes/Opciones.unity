@@ -231,9 +231,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de41258c8a852174c908211896b5d222, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  source: {fileID: 0}
-  esMusicaDeMenu: 0
-  esEscenaOpciones: 1
+  musicaSource: {fileID: 758796032}
+  musicaMenu: {fileID: 8300000, guid: 559be67cd1673a648a8936e6b4863e6e, type: 3}
+  musicaNivel: {fileID: 8300000, guid: bb05b69a4782c384fa58cb56c32e4e7d, type: 3}
+  musicaVictoria: {fileID: 8300000, guid: a6e3ee3c67316d24bb20f25aa0553f5d, type: 3}
+  musicaDerrota: {fileID: 8300000, guid: 941006cb5a932574b9c6cb28882b364b, type: 3}
 --- !u!82 &758796032
 AudioSource:
   m_ObjectHideFlags: 0
@@ -523,6 +525,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sliderVolumen: {fileID: 9694948}
   sliderSensibilidad: {fileID: 1676537144}
+  contenedorSlider: {fileID: 0}
 --- !u!4 &2122630143
 Transform:
   m_ObjectHideFlags: 0

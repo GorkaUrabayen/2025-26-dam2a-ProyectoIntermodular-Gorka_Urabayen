@@ -3,29 +3,35 @@ using UnityEngine.SceneManagement;
 
 public class MenuInicio : MonoBehaviour
 {
-    // TIENE QUE SER PUBLIC
+    // Función para el botón JUGAR
     public void Jugar() 
     {
         SceneManager.LoadScene("Nivel1"); 
     }
+    public void AbrirOpciones() 
+    {
+        SceneManager.LoadScene("Opciones"); 
+    }
 
-    // TIENE QUE SER PUBLIC
+    // Función para el botón CONTROLES (Nueva escena)
+    public void IrAControles()
+    {
+        // Guardamos la escena actual (EscenaInicio) para saber a dónde volver
+        PlayerPrefs.SetString("UltimaEscena", SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene("Controles"); 
+    }
+
+    // Función para el botón VOLVER (dentro de la escena Controles)
+    public void VolverAEscenaAnterior()
+    {
+        string escenaAnterior = PlayerPrefs.GetString("UltimaEscena", "EscenaInicio");
+        SceneManager.LoadScene(escenaAnterior);
+    }
+
+    // Función para el botón SALIR
     public void Salir()
     {
         Application.Quit();
-    }
-  public void AbrirOpciones()
-    {
-      {
-        // Guardamos la escena actual antes de irnos
-        PlayerPrefs.SetString("UltimaEscena", SceneManager.GetActiveScene().name);
-        SceneManager.LoadScene("Opciones"); 
-    }
-}
-public void VolverAEscenaAnterior()
-    {
-        // Buscamos la clave "UltimaEscena". Si no existe, por defecto va al MenuPrincipal
-        string escenaAnterior = PlayerPrefs.GetString("UltimaEscena", "MenuPrincipal");
-        SceneManager.LoadScene(escenaAnterior);
+        Debug.Log("Saliendo del juego...");
     }
 }

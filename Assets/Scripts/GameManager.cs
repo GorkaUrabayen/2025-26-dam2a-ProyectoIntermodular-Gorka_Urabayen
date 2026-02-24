@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        // Detectar pausa con Espacio (solo si no estamos en el menú principal, derrota o victoria)
+        // Detectar pausa manual con Espacio
         string escena = SceneManager.GetActiveScene().name;
         if (Input.GetKeyDown(KeyCode.Space) && escena != "EscenaInicio" && escena != "Derrota" && escena != "Victoria")
         {
@@ -55,16 +55,11 @@ public class GameManager : MonoBehaviour
     {
         juegoPausado = !juegoPausado;
 
-        if (juegoPausado)
-        {
-            Time.timeScale = 0f; // Detiene el tiempo
-            if (panelPausa != null) panelPausa.SetActive(true);
-        }
-        else
-        {
-            Time.timeScale = 1f; // Reanuda el tiempo
-            if (panelPausa != null) panelPausa.SetActive(false);
-        }
+        // Si está pausado, tiempo a 0. Si no, tiempo a 1.
+        Time.timeScale = juegoPausado ? 0f : 1f;
+
+        if (panelPausa != null) 
+            panelPausa.SetActive(juegoPausado);
     }
 
     void AlCargarEscena(Scene escena, LoadSceneMode modo)
@@ -72,21 +67,16 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f; 
         juegoPausado = false;
 
-        // --- GESTIÓN DE AUDIO SEGÚN ESCENA ---
-        // Llama a los métodos del AudioManager (asegúrate de que existan allí)
+        // Gestión de Audio
         if (AudioManager.instancia != null)
         {
-            if (escena.name == "Derrota")
-                AudioManager.instancia.PlayMusicaDerrota();
-            else if (escena.name == "Victoria")
-                AudioManager.instancia.PlayMusicaVictoria();
-            else if (escena.name == "EscenaInicio")
-                AudioManager.instancia.PlayMusicaMenu();
-            else
-                AudioManager.instancia.PlayMusicaNivel();
+            if (escena.name == "Derrota") AudioManager.instancia.PlayMusicaDerrota();
+            else if (escena.name == "Victoria") AudioManager.instancia.PlayMusicaVictoria();
+            else if (escena.name == "EscenaInicio") AudioManager.instancia.PlayMusicaMenu();
+            else AudioManager.instancia.PlayMusicaNivel();
         }
 
-        // 1. Resetear Stats según el nivel
+        // Resetear Stats según el nivel
         if (escena.name == "Nivel1")
         {
             vidas = 10;
@@ -99,8 +89,6 @@ public class GameManager : MonoBehaviour
         }
 
         enemigosRestantes = 0;
-        
-        // Limpiamos referencias para buscarlas en la nueva escena
         txtVidas = null;
         txtDinero = null;
         panelPausa = null; 
@@ -111,18 +99,15 @@ public class GameManager : MonoBehaviour
 
     IEnumerator BuscarUIPorPasos()
     {
-        // Espera un frame para que los objetos de la nueva escena existan
         yield return new WaitForEndOfFrame();
         ReconectarUI();
-
-        // Reintento extra por si la escena es pesada
         yield return new WaitForSeconds(0.1f);
         if (txtVidas == null || txtDinero == null) ReconectarUI();
     }
 
     private void ReconectarUI()
     {
-        // --- 1. Conectar Textos ---
+        // 1. Conectar Textos
         TMP_Text[] todosLosTextos = FindObjectsOfType<TMP_Text>(true);
         foreach (TMP_Text t in todosLosTextos)
         {
@@ -130,7 +115,7 @@ public class GameManager : MonoBehaviour
             if (t.gameObject.name == "TextoDinero") txtDinero = t;
         }
 
-        // --- 2. Buscar el Panel de Pausa ---
+        // 2. Buscar el Panel de Pausa
         GameObject buscado = GameObject.Find("MenuPausa");
         if (buscado != null) 
         {
@@ -138,11 +123,11 @@ public class GameManager : MonoBehaviour
             panelPausa.SetActive(false); 
         }
 
-        // --- 3. Conectar Botones automáticamente por Nombre ---
+        // 3. Conectar Botones automáticamente
         Button[] todosLosBotones = FindObjectsOfType<Button>(true);
         foreach (Button btn in todosLosBotones)
         {
-            btn.onClick.RemoveAllListeners(); // Evita funciones duplicadas
+            btn.onClick.RemoveAllListeners();
 
             if (btn.gameObject.name == "Reiniciar") 
                 btn.onClick.AddListener(() => ReiniciarNivel());
@@ -166,18 +151,14 @@ public class GameManager : MonoBehaviour
         if (txtDinero != null) txtDinero.text = "Dinero: " + dinero;
     }
 
-    // --- LÓGICA DE PROGRESIÓN ---
-
     public void NotificarMuerteEnemigo()
     {
         enemigosRestantes--;
         if (enemigosRestantes <= 0)
         {
             string escenaActual = SceneManager.GetActiveScene().name;
-            if (escenaActual == "Nivel1")
-                Invoke("PasarAlSiguienteNivel", 2f);
-            else if (escenaActual == "Nivel2")
-                Invoke("CargarVictoria", 2f);
+            if (escenaActual == "Nivel1") Invoke("PasarAlSiguienteNivel", 2f);
+            else if (escenaActual == "Nivel2") Invoke("CargarVictoria", 2f);
         }
     }
 
@@ -189,11 +170,7 @@ public class GameManager : MonoBehaviour
         vidas -= cantidad;
         if (vidas < 0) vidas = 0;
         ActualizarUI();
-        
-        if (vidas <= 0) 
-        {
-            SceneManager.LoadScene("Derrota");
-        }
+        if (vidas <= 0) SceneManager.LoadScene("Derrota");
     }
 
     public void GanarDinero(int cantidad)
@@ -219,13 +196,10 @@ public class GameManager : MonoBehaviour
             Cursor.SetCursor(cursorSprite, hotSpot, CursorMode.Auto);
     }
 
-    // --- MÉTODOS DE NAVEGACIÓN ---
-
     public void ReiniciarNivel()
     {
         Time.timeScale = 1f; 
-        string nombreEscenaActual = SceneManager.GetActiveScene().name;
-        SceneManager.LoadScene(nombreEscenaActual);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void VolverAlMenu()
@@ -237,6 +211,5 @@ public class GameManager : MonoBehaviour
     public void SalirDelJuego()
     {
         Application.Quit();
-        Debug.Log("Saliendo del juego...");
     }
 }

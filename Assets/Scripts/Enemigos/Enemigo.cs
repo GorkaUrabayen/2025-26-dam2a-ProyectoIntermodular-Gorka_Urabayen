@@ -104,7 +104,7 @@ public class Enemigo : MonoBehaviour
     float distancia = direccion.magnitude;
 
     // Si estamos muy cerca del punto actual, pasamos al siguiente
-    if (distancia < 0.15f) // Aumentamos un poco el margen de error
+    if (distancia < 0.25f) // Aumentamos un poco el margen de error
     {
         indiceWaypoint++;
         

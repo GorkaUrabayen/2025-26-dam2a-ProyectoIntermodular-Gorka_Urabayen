@@ -479,7 +479,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 243, y: -561}
+  m_AnchoredPosition: {x: 285, y: -439}
   m_SizeDelta: {x: 238.5472, y: 62.4076}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &805216938
@@ -1184,7 +1184,7 @@ MonoBehaviour:
     nuevamente para confirmar la construcci\xF3n.\n\nCancelar Selecci\xF3n: Si tienes
     una torre seleccionada pero decides no ponerla, haz Clic Derecho en cualquier
     lugar para deseleccionarla sin gastar dinero.\n\nMen\xFA y Opciones\nPausar el
-    Juego: Puedes detener la partida en cualquier momento pulsando la tecla Espacio
+    Juego: Puedes detener la partida en cualquier momento pulsando la tecla Escape/Espacio
     o haciendo clic en el Bot\xF3n de Pausa.\n\nAjustes de Sonido: Para modificar
     el volumen de la m\xFAsica y efectos durante la partida, pulsa el bot\xF3n de
     Opciones (el icono del engranaje) para desplegar el control de volumen."

@@ -197,9 +197,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0ad5248012345e458019dbd91250954, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidad: 30
+  velocidad: 10
   vida: 6
-  recompensa: 5
+  recompensa: 15
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
 --- !u!114 &4365052230030366524

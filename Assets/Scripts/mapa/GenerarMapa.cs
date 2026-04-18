@@ -28,7 +28,8 @@ public class GenerarMapa : MonoBehaviour
     public List<Vector3> waypoints;
 
     public event System.Action OnMapaGenerado;
-
+    [Header("Ajustes de Posición")]
+    public int offsetY = 5; // Cuántas casillas quieres que suba el mapa
     void Start()
     {
         GenerarMapaCompleto();
@@ -45,7 +46,8 @@ public class GenerarMapa : MonoBehaviour
         {
             for (int y = 0; y < altoMapa; y++)
             {
-                Vector3Int pos = new Vector3Int(x, y, 0);
+                // APLICAMOS EL OFFSET AQUÍ
+                Vector3Int pos = new Vector3Int(x, y + offsetY, 0);
 
                 if (x == 0 && y == 0) tilemap.SetTile(pos, esquinaAbajoIzquierda);
                 else if (x == 0 && y == altoMapa - 1) tilemap.SetTile(pos, esquinaArribaIzquierda);
@@ -75,19 +77,14 @@ public class GenerarMapa : MonoBehaviour
 
         foreach (var celda in camino)
         {
-            Vector3Int posCelda = new Vector3Int(celda.x, celda.y, 0);
+            // APLICAMOS EL OFFSET TAMBIÉN AL CAMINO
+            Vector3Int posCelda = new Vector3Int(celda.x, celda.y + offsetY, 0);
             
-            // Colocamos el tile visualmente
             tilemap.SetTile(posCelda, caminoTile);
-            
-            // Marcamos en la matriz lógica (1 = camino)
             mapa[celda.x, celda.y] = 1;
 
-            // --- ESTE ES EL CAMBIO CLAVE ---
-            // Usamos GetCellCenterWorld para que Unity nos de el centro exacto de la casilla
-            // así los enemigos irán por el medio perfecto.
             Vector3 centroMundo = tilemap.GetCellCenterWorld(posCelda);
-            centroMundo.z = -1f; // Mantenemos el z=-1 para que el enemigo se vea por encima
+            centroMundo.z = -1f; 
             
             waypoints.Add(centroMundo);
         }

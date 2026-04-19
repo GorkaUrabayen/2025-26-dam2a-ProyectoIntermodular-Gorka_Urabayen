@@ -91,49 +91,63 @@ public class GenerarMapa : MonoBehaviour
     }
 
     List<Vector2Int> GenerarCamino(Vector2Int inicio, Vector2Int fin, int zigzags)
+{
+    List<Vector2Int> path = new List<Vector2Int>();
+    path.Add(inicio);
+    Vector2Int actual = inicio;
+
+    int totalZig = zigzags;
+    int ancho = fin.x - inicio.x;
+    
+    // Calculamos el tamaño del segmento, pero restamos un margen de seguridad
+    // para que los zigzags no toquen la columna del final (fin.x)
+    int columnaLimite = fin.x - 1; 
+    int segmento = (columnaLimite - inicio.x) / (totalZig + 1);
+
+    for (int z = 0; z <= totalZig; z++)
     {
-        List<Vector2Int> path = new List<Vector2Int>();
-        path.Add(inicio);
-        Vector2Int actual = inicio;
+        // El targetX ahora respeta el límite de no acercarse al final antes de tiempo
+        int targetX = inicio.x + segmento * (z + 1);
+        
+        // Evitamos por completo que targetX sea igual a fin.x
+        if (targetX >= fin.x) targetX = fin.x - 1;
 
-        int totalZig = zigzags;
-        int ancho = fin.x - inicio.x;
-        int segmento = ancho / (totalZig + 1);
+        int targetY = Random.Range(1, altoMapa - 1);
 
-        for (int z = 0; z <= totalZig; z++)
+        // Movimiento en X
+        int stepX = targetX > actual.x ? 1 : -1;
+        while (actual.x != targetX)
         {
-            int targetX = inicio.x + segmento * (z + 1);
-            int targetY = Random.Range(1, altoMapa - 1);
-
-            int stepX = targetX > actual.x ? 1 : -1;
-            while (actual.x != targetX)
-            {
-                actual.x += stepX;
-                path.Add(new Vector2Int(actual.x, actual.y));
-            }
-
-            int stepY = targetY > actual.y ? 1 : -1;
-            while (actual.y != targetY)
-            {
-                actual.y += stepY;
-                path.Add(new Vector2Int(actual.x, actual.y));
-            }
-        }
-
-        int stepXFin = fin.x > actual.x ? 1 : -1;
-        while (actual.x != fin.x)
-        {
-            actual.x += stepXFin;
+            actual.x += stepX;
             path.Add(new Vector2Int(actual.x, actual.y));
         }
 
-        int stepYFin = fin.y > actual.y ? 1 : -1;
-        while (actual.y != fin.y)
+        // Movimiento en Y
+        int stepY = targetY > actual.y ? 1 : -1;
+        while (actual.y != targetY)
         {
-            actual.y += stepYFin;
+            actual.y += stepY;
             path.Add(new Vector2Int(actual.x, actual.y));
         }
-
-        return path;
     }
+
+    // TRAMO FINAL: Una vez terminados los zigzags, vamos directos al final.
+    // Primero terminamos de avanzar en X hasta la columna del final.
+    int stepXFin = fin.x > actual.x ? 1 : -1;
+    while (actual.x != fin.x)
+    {
+        actual.x += stepXFin;
+        path.Add(new Vector2Int(actual.x, actual.y));
+    }
+
+    // Y finalmente ajustamos la Y si el punto final está a otra altura.
+    int stepYFin = fin.y > actual.y ? 1 : -1;
+    while (actual.y != fin.y)
+    {
+        actual.y += stepYFin;
+        path.Add(new Vector2Int(actual.x, actual.y));
+    }
+
+    return path;
+}
 }

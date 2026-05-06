@@ -16,7 +16,25 @@ EditorBuildSettings:
     guid: 9b8d942190d1f7e43a4b216a49974dc6
   - enabled: 1
     path: Assets/Scenes/Nivel3.unity
+    guid: 9ee871a18739bda4290890db91690133
+  - enabled: 1
+    path: Assets/Scenes/Nivel4.unity
+    guid: eb802696b1ce8a74c8fe3192dfc8654f
+  - enabled: 1
+    path: Assets/Scenes/Nivel5.unity
+    guid: 67c7322e8f9e82c40b0a809bdb598360
+  - enabled: 1
+    path: Assets/Scenes/Nivel6.unity
     guid: a82a194df78efa34d92dd200bb5b4541
+  - enabled: 1
+    path: Assets/Scenes/Nivel7.unity
+    guid: 8f267553d4892cc4d9fc13474646313e
+  - enabled: 1
+    path: Assets/Scenes/Nivel8.unity
+    guid: aa5426daca6ee094ea84682579b73314
+  - enabled: 1
+    path: Assets/Scenes/Nivel10.unity
+    guid: c6843fa957c2bb2449a5350fc5dccabf
   - enabled: 1
     path: Assets/Scenes/Derrota.unity
     guid: a7fa8291b3aacfd4794198082c8d011f

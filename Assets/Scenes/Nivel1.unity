@@ -504,11 +504,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nivelMaximo: 10
-  dineroBase: 20
+  dineroBase: 50
   dineroPorNivel: 10
   vidasIniciales: 10
   vidas: 10
-  dinero: 30
+  dinero: 60
   enemigosRestantes: 0
   txtVidas: {fileID: 1174735708}
   txtDinero: {fileID: 430511178}

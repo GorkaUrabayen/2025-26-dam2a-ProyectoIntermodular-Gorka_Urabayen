@@ -4,7 +4,7 @@ public class Skull : Enemigo
     {
         base.Awake();
         velocidad = 1.5f;
-        vida = 6;
+        vida = 5;
         recompensa = 5; // Dinero Skull
     }
 }

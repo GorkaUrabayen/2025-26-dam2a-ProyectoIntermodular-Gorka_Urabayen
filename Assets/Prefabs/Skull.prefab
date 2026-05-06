@@ -271,7 +271,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocidad: 0.5
-  vida: 6
+  vida: 3
   recompensa: 10
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}

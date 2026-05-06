@@ -13,7 +13,10 @@ EditorBuildSettings:
     guid: 5ea84272b415781448d5e744df5c99a6
   - enabled: 1
     path: Assets/Scenes/Nivel2.unity
-    guid: 2c90126a5a5891144bc333492b866d39
+    guid: 9b8d942190d1f7e43a4b216a49974dc6
+  - enabled: 1
+    path: Assets/Scenes/Nivel3.unity
+    guid: a82a194df78efa34d92dd200bb5b4541
   - enabled: 1
     path: Assets/Scenes/Derrota.unity
     guid: a7fa8291b3aacfd4794198082c8d011f

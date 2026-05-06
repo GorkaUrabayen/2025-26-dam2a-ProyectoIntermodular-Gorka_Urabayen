@@ -8,6 +8,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instancia;
 
+    [Header("Configuración de Progresión")]
+    public int nivelMaximo = 10;
+    public int dineroBase = 20;
+    public int dineroPorNivel = 10;
+    public int vidasIniciales = 10;
+
     [Header("Stats Actuales")]
     public int vidas;
     public int dinero;
@@ -26,7 +32,6 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        // Sistema Singleton: mantiene este objeto entre escenas
         if (instancia == null)
         {
             instancia = this;
@@ -43,7 +48,6 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        // Detectar pausa manual con Espacio
         string escena = SceneManager.GetActiveScene().name;
         if (Input.GetKeyDown(KeyCode.Space) && escena != "EscenaInicio" && escena != "Derrota" && escena != "Victoria")
         {
@@ -54,8 +58,6 @@ public class GameManager : MonoBehaviour
     public void AlternarPausa()
     {
         juegoPausado = !juegoPausado;
-
-        // Si está pausado, tiempo a 0. Si no, tiempo a 1.
         Time.timeScale = juegoPausado ? 0f : 1f;
 
         if (panelPausa != null) 
@@ -76,16 +78,16 @@ public class GameManager : MonoBehaviour
             else AudioManager.instancia.PlayMusicaNivel();
         }
 
-        // Resetear Stats según el nivel
-        if (escena.name == "Nivel1")
+        // --- LÓGICA DINÁMICA DE NIVELES ---
+        if (escena.name.StartsWith("Nivel"))
         {
-            vidas = 10;
-            dinero = 30;
-        }
-        else if (escena.name == "Nivel2")
-        {
-            vidas = 10;
-            dinero = 40;
+            string numeroString = escena.name.Replace("Nivel", "");
+            if (int.TryParse(numeroString, out int numNivel))
+            {
+                vidas = vidasIniciales;
+                // Fórmula: 20 + (1 * 10) = 30 para nivel 1, 40 para nivel 2...
+                dinero = dineroBase + (numNivel * dineroPorNivel);
+            }
         }
 
         enemigosRestantes = 0;
@@ -97,6 +99,45 @@ public class GameManager : MonoBehaviour
         ConfigurarCursor();
     }
 
+    public void NotificarMuerteEnemigo()
+    {
+        enemigosRestantes--;
+        if (enemigosRestantes <= 0)
+        {
+            Invoke("GestionarCambioDeNivel", 2f);
+        }
+    }
+
+    private void GestionarCambioDeNivel()
+    {
+        string nombreActual = SceneManager.GetActiveScene().name;
+
+        if (nombreActual.StartsWith("Nivel"))
+        {
+            string numeroString = nombreActual.Replace("Nivel", "");
+            if (int.TryParse(numeroString, out int nivelActual))
+            {
+                if (nivelActual >= nivelMaximo)
+                {
+                    CargarVictoria();
+                }
+                else
+                {
+                    int siguiente = nivelActual + 1;
+                    SceneManager.LoadScene("Nivel" + siguiente);
+                }
+            }
+        }
+        else
+        {
+            CargarVictoria();
+        }
+    }
+
+    public void CargarVictoria() => SceneManager.LoadScene("Victoria");
+
+    // --- RESTO DE FUNCIONES (UI Y CONTROL) ---
+
     IEnumerator BuscarUIPorPasos()
     {
         yield return new WaitForEndOfFrame();
@@ -107,7 +148,6 @@ public class GameManager : MonoBehaviour
 
     private void ReconectarUI()
     {
-        // 1. Conectar Textos
         TMP_Text[] todosLosTextos = FindObjectsOfType<TMP_Text>(true);
         foreach (TMP_Text t in todosLosTextos)
         {
@@ -115,7 +155,6 @@ public class GameManager : MonoBehaviour
             if (t.gameObject.name == "TextoDinero") txtDinero = t;
         }
 
-        // 2. Buscar el Panel de Pausa
         GameObject buscado = GameObject.Find("MenuPausa");
         if (buscado != null) 
         {
@@ -123,23 +162,14 @@ public class GameManager : MonoBehaviour
             panelPausa.SetActive(false); 
         }
 
-        // 3. Conectar Botones automáticamente
         Button[] todosLosBotones = FindObjectsOfType<Button>(true);
         foreach (Button btn in todosLosBotones)
         {
             btn.onClick.RemoveAllListeners();
-
-            if (btn.gameObject.name == "Reiniciar") 
-                btn.onClick.AddListener(() => ReiniciarNivel());
-            
-            if (btn.gameObject.name == "Volver al menu") 
-                btn.onClick.AddListener(() => VolverAlMenu());
-
-            if (btn.gameObject.name == "Salir") 
-                btn.onClick.AddListener(() => SalirDelJuego());
-
-            if (btn.gameObject.name == "Reanudar")
-                btn.onClick.AddListener(() => AlternarPausa());
+            if (btn.gameObject.name == "Reiniciar") btn.onClick.AddListener(() => ReiniciarNivel());
+            if (btn.gameObject.name == "Volver al menu") btn.onClick.AddListener(() => VolverAlMenu());
+            if (btn.gameObject.name == "Salir") btn.onClick.AddListener(() => Salir());
+            if (btn.gameObject.name == "Reanudar") btn.onClick.AddListener(() => AlternarPausa());
         }
 
         ActualizarUI();
@@ -150,20 +180,6 @@ public class GameManager : MonoBehaviour
         if (txtVidas != null) txtVidas.text = "Vidas: " + vidas;
         if (txtDinero != null) txtDinero.text = "Dinero: " + dinero;
     }
-
-    public void NotificarMuerteEnemigo()
-    {
-        enemigosRestantes--;
-        if (enemigosRestantes <= 0)
-        {
-            string escenaActual = SceneManager.GetActiveScene().name;
-            if (escenaActual == "Nivel1") Invoke("PasarAlSiguienteNivel", 2f);
-            else if (escenaActual == "Nivel2") Invoke("CargarVictoria", 2f);
-        }
-    }
-
-    public void PasarAlSiguienteNivel() => SceneManager.LoadScene("Nivel2");
-    public void CargarVictoria() => SceneManager.LoadScene("Victoria");
 
     public void PerderVida(int cantidad)
     {
@@ -208,8 +224,9 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("EscenaInicio");
     }
 
-    public void SalirDelJuego()
+     public void Salir()
     {
         Application.Quit();
+        Debug.Log("Saliendo del juego...");
     }
 }

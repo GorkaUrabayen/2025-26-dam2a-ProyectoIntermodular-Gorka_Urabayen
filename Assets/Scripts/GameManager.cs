@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     public int dinero;
     public int enemigosRestantes = 0;
 
-    [Header("UI References (Se buscan solas)")]
+    [Header("UI References")]
     public TMP_Text txtVidas;
     public TMP_Text txtDinero;
     public GameObject panelPausa; 
@@ -48,8 +48,11 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        // Solo permitimos pausar si no estamos en menús o escenas finales
         string escena = SceneManager.GetActiveScene().name;
-        if (Input.GetKeyDown(KeyCode.Space) && escena != "EscenaInicio" && escena != "Derrota" && escena != "Victoria")
+        bool esEscenaDeJuego = escena != "EscenaInicio" && escena != "Derrota" && escena != "Victoria";
+
+        if (Input.GetKeyDown(KeyCode.Space) && esEscenaDeJuego)
         {
             AlternarPausa();
         }
@@ -57,6 +60,9 @@ public class GameManager : MonoBehaviour
 
     public void AlternarPausa()
     {
+        // Si no hay panel de pausa, intentamos buscarlo una vez más
+        if (panelPausa == null) ReconectarUI();
+
         juegoPausado = !juegoPausado;
         Time.timeScale = juegoPausado ? 0f : 1f;
 
@@ -66,9 +72,11 @@ public class GameManager : MonoBehaviour
 
     void AlCargarEscena(Scene escena, LoadSceneMode modo)
     {
+        // Reset de estado básico
         Time.timeScale = 1f; 
         juegoPausado = false;
 
+        // Música
         if (AudioManager.instancia != null)
         {
             if (escena.name == "Derrota") AudioManager.instancia.PlayMusicaDerrota();
@@ -77,6 +85,7 @@ public class GameManager : MonoBehaviour
             else AudioManager.instancia.PlayMusicaNivel();
         }
 
+        // Configuración de stats por nivel
         if (escena.name.StartsWith("Nivel"))
         {
             string numeroString = escena.name.Replace("Nivel", "");
@@ -89,12 +98,11 @@ public class GameManager : MonoBehaviour
 
         enemigosRestantes = 0;
         
-        // --- IMPORTANTE: Limpiamos referencias viejas ---
+        // Limpiamos referencias para forzar la búsqueda en la nueva escena
         txtVidas = null;
         txtDinero = null;
         panelPausa = null; 
 
-        // Esperamos un poquito más para asegurar que la escena cargó los objetos
         StopAllCoroutines(); 
         StartCoroutine(BuscarUIPorPasos());
         ConfigurarCursor();
@@ -102,59 +110,50 @@ public class GameManager : MonoBehaviour
 
     IEnumerator BuscarUIPorPasos()
     {
-        // Esperamos a que termine el frame de carga
         yield return new WaitForEndOfFrame();
         ReconectarUI();
-        
-        // Pequeño re-intento por seguridad
-        yield return new WaitForSeconds(0.2f);
+        // Un segundo intento tras un breve delay por si la UI tarda en instanciarse
+        yield return new WaitForSeconds(0.1f);
         if (panelPausa == null) ReconectarUI();
     }
 
     private void ReconectarUI()
     {
-        // 1. Buscar Textos
+        // 1. Buscar Textos (incluyendo desactivados)
         TMP_Text[] todosLosTextos = Resources.FindObjectsOfTypeAll<TMP_Text>();
         foreach (TMP_Text t in todosLosTextos)
         {
+            if (t.gameObject.scene.name == null) continue; // Ignorar prefabs de la carpeta Assets
             if (t.gameObject.name == "TextoVidas") txtVidas = t;
             if (t.gameObject.name == "TextoDinero") txtDinero = t;
         }
 
-        // 2. Buscar Panel Pausa por nombre (asegúrate que se llame así en la jerarquía)
-        if (panelPausa == null)
+        // 2. Buscar Panel Pausa y Botones
+        GameObject[] todosLosGos = Resources.FindObjectsOfTypeAll<GameObject>();
+        foreach (GameObject go in todosLosGos)
         {
-            GameObject[] todosLosGos = Resources.FindObjectsOfTypeAll<GameObject>();
-            foreach (GameObject go in todosLosGos)
+            if (go.gameObject.scene.name == null) continue;
+
+            // Encontrar el panel
+            if (go.name == "MenuPausa") 
             {
-                if (go.name == "MenuPausa") 
-                {
-                    panelPausa = go;
-                    panelPausa.SetActive(false);
-                    break;
-                }
+                panelPausa = go;
+                panelPausa.SetActive(false);
             }
-        }
 
-        // 3. Buscar y conectar Botones
-        Button[] todosLosBotones = Resources.FindObjectsOfTypeAll<Button>();
-        foreach (Button btn in todosLosBotones)
-        {
-            // Solo configuramos botones que pertenezcan a la escena actual (no assets del proyecto)
-            if (btn.gameObject.scene.name == null) continue;
-
-            btn.onClick.RemoveAllListeners();
-
-            if (btn.gameObject.name == "Reiniciar") btn.onClick.AddListener(ReiniciarNivel);
-            if (btn.gameObject.name == "Volver al menu") btn.onClick.AddListener(VolverAlMenu);
-            if (btn.gameObject.name == "Reanudar") btn.onClick.AddListener(AlternarPausa);
-            if (btn.gameObject.name == "Salir") btn.onClick.AddListener(Salir);
+            // Configurar botones si el objeto tiene componente Button
+            Button btn = go.GetComponent<Button>();
+            if (btn != null)
+            {
+                if (go.name == "Reiniciar") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(ReiniciarNivel); }
+                if (go.name == "Volver al menu") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(VolverAlMenu); }
+                if (go.name == "Reanudar") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(AlternarPausa); }
+                if (go.name == "Salir") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(Salir); }
+            }
         }
 
         ActualizarUI();
     }
-
-    // --- EL RESTO DEL SCRIPT SIGUE IGUAL ---
 
     public void ActualizarUI()
     {
@@ -187,6 +186,7 @@ public class GameManager : MonoBehaviour
     public void PerderVida(int cantidad)
     {
         vidas -= cantidad;
+        if (vidas < 0) vidas = 0;
         ActualizarUI();
         if (vidas <= 0) SceneManager.LoadScene("Derrota");
     }
@@ -219,6 +219,7 @@ public class GameManager : MonoBehaviour
     public void Salir()
     {
         Debug.Log("Saliendo del juego...");
+        Time.timeScale = 1f; 
         #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
         #else

@@ -49,6 +49,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         string escena = SceneManager.GetActiveScene().name;
+        // Solo pausar si no estamos en menús o escenas de fin
         if (Input.GetKeyDown(KeyCode.Space) && escena != "EscenaInicio" && escena != "Derrota" && escena != "Victoria")
         {
             AlternarPausa();
@@ -78,14 +79,13 @@ public class GameManager : MonoBehaviour
             else AudioManager.instancia.PlayMusicaNivel();
         }
 
-        // --- LÓGICA DINÁMICA DE NIVELES ---
+        // Lógica de niveles: Dinero = 20 + (Nivel * 10)
         if (escena.name.StartsWith("Nivel"))
         {
             string numeroString = escena.name.Replace("Nivel", "");
             if (int.TryParse(numeroString, out int numNivel))
             {
                 vidas = vidasIniciales;
-                // Fórmula: 20 + (1 * 10) = 30 para nivel 1, 40 para nivel 2...
                 dinero = dineroBase + (numNivel * dineroPorNivel);
             }
         }
@@ -117,15 +117,8 @@ public class GameManager : MonoBehaviour
             string numeroString = nombreActual.Replace("Nivel", "");
             if (int.TryParse(numeroString, out int nivelActual))
             {
-                if (nivelActual >= nivelMaximo)
-                {
-                    CargarVictoria();
-                }
-                else
-                {
-                    int siguiente = nivelActual + 1;
-                    SceneManager.LoadScene("Nivel" + siguiente);
-                }
+                if (nivelActual >= nivelMaximo) CargarVictoria();
+                else SceneManager.LoadScene("Nivel" + (nivelActual + 1));
             }
         }
         else
@@ -135,8 +128,6 @@ public class GameManager : MonoBehaviour
     }
 
     public void CargarVictoria() => SceneManager.LoadScene("Victoria");
-
-    // --- RESTO DE FUNCIONES (UI Y CONTROL) ---
 
     IEnumerator BuscarUIPorPasos()
     {
@@ -148,6 +139,7 @@ public class GameManager : MonoBehaviour
 
     private void ReconectarUI()
     {
+        // 1. Textos
         TMP_Text[] todosLosTextos = FindObjectsOfType<TMP_Text>(true);
         foreach (TMP_Text t in todosLosTextos)
         {
@@ -155,6 +147,7 @@ public class GameManager : MonoBehaviour
             if (t.gameObject.name == "TextoDinero") txtDinero = t;
         }
 
+        // 2. Panel Pausa
         GameObject buscado = GameObject.Find("MenuPausa");
         if (buscado != null) 
         {
@@ -162,14 +155,20 @@ public class GameManager : MonoBehaviour
             panelPausa.SetActive(false); 
         }
 
+        // 3. Botones (IMPORTANTE: Nombres exactos en la jerarquía)
         Button[] todosLosBotones = FindObjectsOfType<Button>(true);
         foreach (Button btn in todosLosBotones)
         {
             btn.onClick.RemoveAllListeners();
             if (btn.gameObject.name == "Reiniciar") btn.onClick.AddListener(() => ReiniciarNivel());
             if (btn.gameObject.name == "Volver al menu") btn.onClick.AddListener(() => VolverAlMenu());
-            if (btn.gameObject.name == "Salir") btn.onClick.AddListener(() => Salir());
             if (btn.gameObject.name == "Reanudar") btn.onClick.AddListener(() => AlternarPausa());
+            
+            // Verificamos que el botón se llame "Salir"
+            if (btn.gameObject.name == "Salir") 
+            {
+                btn.onClick.AddListener(() => Salir());
+            }
         }
 
         ActualizarUI();
@@ -180,6 +179,8 @@ public class GameManager : MonoBehaviour
         if (txtVidas != null) txtVidas.text = "Vidas: " + vidas;
         if (txtDinero != null) txtDinero.text = "Dinero: " + dinero;
     }
+
+    // --- FUNCIONES DE CONTROL ---
 
     public void PerderVida(int cantidad)
     {
@@ -224,9 +225,13 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("EscenaInicio");
     }
 
-     public void Salir()
+    public void Salir()
     {
-        Application.Quit();
         Debug.Log("Saliendo del juego...");
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
     }
 }

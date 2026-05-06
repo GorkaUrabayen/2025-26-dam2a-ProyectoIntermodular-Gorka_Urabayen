@@ -5,6 +5,6 @@ public class Lizzard : Enemigo
         base.Awake(); 
         velocidad = 2f;
         vida = 6;
-        recompensa = 15; // Dinero Lizzard
+        recompensa = 8; // Dinero Lizzard
     }
 }

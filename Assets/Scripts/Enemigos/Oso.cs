@@ -5,6 +5,6 @@ public class Oso : Enemigo
         base.Awake(); 
         velocidad = 1f; 
         vida = 40;
-        recompensa = 20; // Dinero Oso
+        recompensa = 10; // Dinero Oso
     }
 }

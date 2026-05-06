@@ -65,16 +65,22 @@ public class GestorTorres : MonoBehaviour
     }
 
     bool EsPosicionConstruible(Vector3Int celda)
-    {
-        if (generadorMapa.mapa == null) return false;
+{
+    if (generadorMapa.mapa == null) return false;
 
-        // Verificar límites del mapa
-        if (celda.x < 0 || celda.x >= generadorMapa.anchoMapa ||
-            celda.y < 0 || celda.y >= generadorMapa.altoMapa) return false;
+    // --- CORRECCIÓN AQUÍ ---
+    // Tenemos que restar el offsetY para que la celda que "toca" el ratón 
+    // coincida con el índice de la matriz lógica.
+    int xLogica = celda.x;
+    int yLogica = celda.y - generadorMapa.offsetY; 
 
-        // Solo se puede construir si el valor en el mapa es 0 (suelo libre)
-        return generadorMapa.mapa[celda.x, celda.y] == 0; 
-    }
+    // Verificar límites del mapa usando las coordenadas corregidas
+    if (xLogica < 0 || xLogica >= generadorMapa.anchoMapa ||
+        yLogica < 0 || yLogica >= generadorMapa.altoMapa) return false;
+
+    // Solo se puede construir si el valor en el mapa corregido es 0
+    return generadorMapa.mapa[xLogica, yLogica] == 0; 
+}
 
     void ActualizarColor(Vector3Int celda)
     {

@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour
         else if (escena.name == "Nivel2")
         {
             vidas = 10;
-            dinero = 60;
+            dinero = 40;
         }
 
         enemigosRestantes = 0;

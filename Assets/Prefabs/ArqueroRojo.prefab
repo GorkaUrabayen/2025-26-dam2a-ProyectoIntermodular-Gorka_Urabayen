@@ -280,4 +280,4 @@ MonoBehaviour:
   danio: 20
   coste: 60
   estaColocada: 0
-  animator: {fileID: 0}
+  animator: {fileID: 532370109953220764}

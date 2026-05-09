@@ -15,22 +15,18 @@ public class GestorTorres : MonoBehaviour
     public bool forzarCentroRejilla = true; 
 
     private GameObject torreTemporal;
-    private GameObject prefabSeleccionado; // Guarda qué torre estamos intentando poner
+    private GameObject prefabSeleccionado; 
     private bool modoColocacion = false;
 
     void Update()
     {
-        // Si no estamos en modo colocación o no hay torre que mover, salimos
         if (!modoColocacion || torreTemporal == null) return;
 
-        // 1. Obtener posición del ratón en el mundo
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = 0f;
 
-        // 2. Calcular celda del Tilemap
         Vector3Int celdaApuntada = generadorMapa.tilemap.WorldToCell(mouseWorldPos);
 
-        // 3. Posicionamiento Visual
         Vector3 posObjetivo;
         if (forzarCentroRejilla)
         {
@@ -42,22 +38,18 @@ public class GestorTorres : MonoBehaviour
             posObjetivo = Vector3.Lerp(torreTemporal.transform.position, mouseWorldPos, Time.deltaTime * 15f * sens);
         }
 
-        // Aplicar correcciones de profundidad y offset
         Vector3 posFinal = posObjetivo + (Vector3)correccionVisual;
         posFinal.z = -1f; 
 
         torreTemporal.transform.position = posFinal;
 
-        // 4. Feedback visual (Verde si se puede, Rojo si no)
         ActualizarColor(celdaApuntada);
 
-        // 5. Click Izquierdo: Intentar colocarla
         if (Input.GetMouseButtonDown(0))
         {
             IntentarColocarTorre(celdaApuntada, posFinal);
         }
 
-        // 6. Click Derecho: Cancelar compra
         if (Input.GetMouseButtonDown(1))
         {
             CancelarColocacion();
@@ -65,50 +57,49 @@ public class GestorTorres : MonoBehaviour
     }
 
     bool EsPosicionConstruible(Vector3Int celda)
-{
-    if (generadorMapa.mapa == null) return false;
+    {
+        if (generadorMapa.mapa == null) return false;
 
-    // --- CORRECCIÓN AQUÍ ---
-    // Tenemos que restar el offsetY para que la celda que "toca" el ratón 
-    // coincida con el índice de la matriz lógica.
-    int xLogica = celda.x;
-    int yLogica = celda.y - generadorMapa.offsetY; 
+        int xLogica = celda.x;
+        int yLogica = celda.y - generadorMapa.offsetY; 
 
-    // Verificar límites del mapa usando las coordenadas corregidas
-    if (xLogica < 0 || xLogica >= generadorMapa.anchoMapa ||
-        yLogica < 0 || yLogica >= generadorMapa.altoMapa) return false;
+        if (xLogica < 0 || xLogica >= generadorMapa.anchoMapa ||
+            yLogica < 0 || yLogica >= generadorMapa.altoMapa) return false;
 
-    // Solo se puede construir si el valor en el mapa corregido es 0
-    return generadorMapa.mapa[xLogica, yLogica] == 0; 
-}
+        return generadorMapa.mapa[xLogica, yLogica] == 0; 
+    }
 
     void ActualizarColor(Vector3Int celda)
     {
+        if (torreTemporal == null) return;
         SpriteRenderer sr = torreTemporal.GetComponent<SpriteRenderer>();
         if (sr == null) return;
 
         if (EsPosicionConstruible(celda))
-            sr.color = new Color(1, 1, 1, 0.6f); // Blanco semitransparente
+            sr.color = new Color(1, 1, 1, 0.6f); 
         else
-            sr.color = new Color(1, 0.2f, 0.2f, 0.6f); // Rojo semitransparente
+            sr.color = new Color(1, 0.2f, 0.2f, 0.6f); 
     }
 
     void IntentarColocarTorre(Vector3Int celda, Vector3 posVisual)
     {
+        // 1. Calculamos las coordenadas lógicas
+        int xLogica = celda.x;
+        int yLogica = celda.y - generadorMapa.offsetY;
+
+        // 2. Validamos si se puede construir
         if (!EsPosicionConstruible(celda)) return;
 
         Torre torreScript = torreTemporal.GetComponent<Torre>();
         if (torreScript == null) return;
 
-        // Verificamos si tenemos dinero suficiente usando el coste del script de la torre
         if (GameManager.instancia.GastarDinero(torreScript.coste))
         {
-            // Marcamos el mapa para que no se pueda poner otra torre encima
-            generadorMapa.mapa[celda.x, celda.y] = 3; 
+            // 3. Marcamos la matriz lógica como ocupada (3)
+            generadorMapa.mapa[xLogica, yLogica] = 3; 
 
             torreTemporal.transform.position = posVisual;
 
-            // Devolvemos el color normal y activamos la torre
             SpriteRenderer sr = torreTemporal.GetComponent<SpriteRenderer>();
             if (sr != null)
             {
@@ -117,23 +108,19 @@ public class GestorTorres : MonoBehaviour
             }
 
             torreScript.estaColocada = true;
-            
             torreTemporal = null;
             modoColocacion = false;
         }
         else
         {
-            Debug.Log("Dinero insuficiente para esta torre.");
+            Debug.Log("Dinero insuficiente.");
         }
     }
 
-    // Esta función es la que debes llamar desde tus botones
-    // tipo 0 = Arquero Normal, tipo 1 = Arquero Negro
     public void EmpezarColocacion(int tipo)
     {
         if (modoColocacion) return;
 
-        // Selección de prefab
         if (tipo == 0) prefabSeleccionado = prefabArqueroNormal;
         else if (tipo == 1) prefabSeleccionado = prefabArqueroRojo;
 

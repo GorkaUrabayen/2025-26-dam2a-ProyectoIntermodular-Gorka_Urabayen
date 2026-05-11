@@ -864,7 +864,7 @@ MonoBehaviour:
   prefabsExtra:
   - {fileID: 4679007936719127254, guid: 1ae43c6068eba3f409c523ed2c741e78, type: 3}
   enemigosPorOleada: 10
-  tiempoEntreEnemigos: 2
+  tiempoEntreEnemigos: 3
   tiempoEntreOleadas: 5
   numeroOleadas: 3
   oleadaMinimaParaExtra: 2

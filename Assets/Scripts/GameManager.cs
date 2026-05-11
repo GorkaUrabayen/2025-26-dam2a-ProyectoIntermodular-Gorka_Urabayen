@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+        // Implementación del patrón Singleton con persistencia
         if (instancia == null)
         {
             instancia = this;
@@ -40,6 +41,7 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return; // Importante para que no ejecute nada más si es un duplicado
         }
     }
 
@@ -58,9 +60,26 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // --- SISTEMA DE NAVEGACIÓN CON TRANSICIONES ---
+    
+    private void CargarEscenaConTransicion(string nombreEscena)
+    {
+        // Busca el script de transición en la escena actual
+        TransicionEscena trans = FindObjectOfType<TransicionEscena>();
+
+        if (trans != null)
+        {
+            trans.IniciarTransicion(nombreEscena);
+        }
+        else
+        {
+            // Si por algún motivo no hay panel de transición, carga directo
+            SceneManager.LoadScene(nombreEscena);
+        }
+    }
+
     public void AlternarPausa()
     {
-        // Si no hay panel de pausa, intentamos buscarlo una vez más
         if (panelPausa == null) ReconectarUI();
 
         juegoPausado = !juegoPausado;
@@ -76,7 +95,7 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f; 
         juegoPausado = false;
 
-        // Música
+        // Gestión de Audio (Si existe el AudioManager)
         if (AudioManager.instancia != null)
         {
             if (escena.name == "Derrota") AudioManager.instancia.PlayMusicaDerrota();
@@ -85,7 +104,7 @@ public class GameManager : MonoBehaviour
             else AudioManager.instancia.PlayMusicaNivel();
         }
 
-        // Configuración de stats por nivel
+        // Configuración de stats según el nivel
         if (escena.name.StartsWith("Nivel"))
         {
             string numeroString = escena.name.Replace("Nivel", "");
@@ -112,18 +131,19 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         ReconectarUI();
-        // Un segundo intento tras un breve delay por si la UI tarda en instanciarse
         yield return new WaitForSeconds(0.1f);
         if (panelPausa == null) ReconectarUI();
     }
 
     private void ReconectarUI()
     {
+        if (instancia != this) return;
+
         // 1. Buscar Textos (incluyendo desactivados)
         TMP_Text[] todosLosTextos = Resources.FindObjectsOfTypeAll<TMP_Text>();
         foreach (TMP_Text t in todosLosTextos)
         {
-            if (t.gameObject.scene.name == null) continue; // Ignorar prefabs de la carpeta Assets
+            if (t.gameObject.scene.name == null) continue;
             if (t.gameObject.name == "TextoVidas") txtVidas = t;
             if (t.gameObject.name == "TextoDinero") txtDinero = t;
         }
@@ -134,24 +154,22 @@ public class GameManager : MonoBehaviour
         {
             if (go.gameObject.scene.name == null) continue;
 
-            // Encontrar el panel
             if (go.name == "MenuPausa") 
             {
                 panelPausa = go;
                 panelPausa.SetActive(false);
             }
 
-            // Configurar botones si el objeto tiene componente Button
             Button btn = go.GetComponent<Button>();
             if (btn != null)
             {
-                if (go.name == "Reiniciar") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(ReiniciarNivel); }
-                if (go.name == "Volver al menu") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(VolverAlMenu); }
-                if (go.name == "Reanudar") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(AlternarPausa); }
-                if (go.name == "Salir") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(Salir); }
+                string nombreBoton = go.name.ToLower().Trim();
+                if (nombreBoton == "reiniciar") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(ReiniciarNivel); }
+                if (nombreBoton == "volver al menu") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(VolverAlMenu); }
+                if (nombreBoton == "reanudar") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(AlternarPausa); }
+                if (nombreBoton == "salir") { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(Salir); }
             }
         }
-
         ActualizarUI();
     }
 
@@ -175,20 +193,18 @@ public class GameManager : MonoBehaviour
             string numeroString = nombreActual.Replace("Nivel", "");
             if (int.TryParse(numeroString, out int nivelActual))
             {
-                if (nivelActual >= nivelMaximo) CargarVictoria();
-                else SceneManager.LoadScene("Nivel" + (nivelActual + 1));
+                if (nivelActual >= nivelMaximo) CargarEscenaConTransicion("Victoria");
+                else CargarEscenaConTransicion("Nivel" + (nivelActual + 1));
             }
         }
     }
-
-    public void CargarVictoria() => SceneManager.LoadScene("Victoria");
 
     public void PerderVida(int cantidad)
     {
         vidas -= cantidad;
         if (vidas < 0) vidas = 0;
         ActualizarUI();
-        if (vidas <= 0) SceneManager.LoadScene("Derrota");
+        if (vidas <= 0) CargarEscenaConTransicion("Derrota");
     }
 
     public void GanarDinero(int cantidad) { dinero += cantidad; ActualizarUI(); }
@@ -206,20 +222,16 @@ public class GameManager : MonoBehaviour
 
     public void ReiniciarNivel()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        CargarEscenaConTransicion(SceneManager.GetActiveScene().name);
     }
 
     public void VolverAlMenu()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("EscenaInicio");
+        CargarEscenaConTransicion("EscenaInicio");
     }
 
     public void Salir()
     {
-        Debug.Log("Saliendo del juego...");
-        Time.timeScale = 1f; 
         #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
         #else

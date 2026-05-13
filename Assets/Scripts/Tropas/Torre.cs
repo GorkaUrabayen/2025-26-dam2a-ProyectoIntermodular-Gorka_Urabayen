@@ -23,7 +23,7 @@ public class Torre : MonoBehaviour
 
     void Update()
     {
-        if (!estaColocada) return; // ❌ No dispara hasta que esté colocada
+        if (!estaColocada) return; // No dispara hasta que esté colocada
 
         objetivoActual = BuscarEnemigoCercano();
 

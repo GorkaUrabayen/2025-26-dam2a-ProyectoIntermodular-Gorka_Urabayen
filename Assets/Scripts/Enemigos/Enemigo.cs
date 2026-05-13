@@ -110,6 +110,7 @@ public class Enemigo : MonoBehaviour
 
     protected virtual void Mover()
     {
+        // Si ya no devbe moverse o el indice es inválido. salimos
         if (!estaVivo || !listoParaMover || waypoints == null || indiceWaypoint >= waypoints.Count) 
             return;
 
@@ -119,10 +120,11 @@ public class Enemigo : MonoBehaviour
         
         Vector2 direccion = objetivo2D - posicionActual2D;
         float distancia = direccion.magnitude;
-
-        if (distancia < 0.25f)
+        // Si estamos muy cerca del punto actual, pasamos al siguiente
+        if (distancia < 0.25f)// Aumentamos un poco el margen de error
         {
             indiceWaypoint++;
+            // Si ya no hay más puntos, muere
             if (indiceWaypoint >= waypoints.Count) 
             {
                 LlegarAlFinal();
@@ -131,9 +133,10 @@ public class Enemigo : MonoBehaviour
         }
         else
         {
+            // Mover hacia el objetivo
             float paso = velocidad * Time.deltaTime;
             rb.MovePosition(posicionActual2D + direccion.normalized * Mathf.Min(paso, distancia));
-            
+            // Rotación opcional: Mirar hacia la dirección del movimiento
             if (direccion.x > 0.1f) transform.localScale = new Vector3(1, 1, 1);
             else if (direccion.x < -0.1f) transform.localScale = new Vector3(-1, 1, 1);
         }

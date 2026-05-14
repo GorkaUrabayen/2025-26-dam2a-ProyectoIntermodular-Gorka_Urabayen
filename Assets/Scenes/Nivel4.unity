@@ -783,7 +783,7 @@ Tilemap:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: 0, y: 0, z: 0}
   m_Size: {x: 477, y: 270, z: 1}
-  m_TileAnchor: {x: 0, y: 0, z: 0}
+  m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
     e00: 1
@@ -1085,7 +1085,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 547, y: 334}
+  m_AnchoredPosition: {x: 569.56726, y: 330}
   m_SizeDelta: {x: 44.0369, y: 34.0369}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &392125576
@@ -1160,7 +1160,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 635.4327, y: 330.52924}
+  m_AnchoredPosition: {x: 658, y: 326.52924}
   m_SizeDelta: {x: 127.6368, y: 50.3255}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &430511178
@@ -2024,7 +2024,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 625.3, y: 224.29994}
+  m_AnchoredPosition: {x: 647.86725, y: 220.29994}
   m_SizeDelta: {x: 115.0565, y: 37.5925}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1174735708
@@ -2815,7 +2815,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 629.1, y: 411.29996}
+  m_AnchoredPosition: {x: 651.66724, y: 407.29996}
   m_SizeDelta: {x: 238.5472, y: 62.41}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1415012207
@@ -3382,7 +3382,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 547, y: 241}
+  m_AnchoredPosition: {x: 569.56726, y: 237}
   m_SizeDelta: {x: 40, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1778247839

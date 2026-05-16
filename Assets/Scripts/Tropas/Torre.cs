@@ -85,6 +85,7 @@ public class Torre : MonoBehaviour
     {
         if (flechaPrefab != null && puntoDisparo != null && objetivoActual != null)
         {
+            // Instanciamos el proyectil y le asignamos el objetivo y daño
             GameObject flecha = Instantiate(flechaPrefab, puntoDisparo.position, Quaternion.identity);
             Flecha f = flecha.GetComponent<Flecha>();
             if (f != null)

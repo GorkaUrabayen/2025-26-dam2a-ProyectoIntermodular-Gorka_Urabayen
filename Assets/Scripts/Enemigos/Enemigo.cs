@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+// Clase base para el comportamiento de los enemigos.
+// Controla el movimiento por waypoints, salud, recompensas y escalado de dificultad.
 [RequireComponent(typeof(Rigidbody2D))]
 public class Enemigo : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class Enemigo : MonoBehaviour
 
     [Header("Visual")]
     public SpriteRenderer spriteRenderer; 
-
+    // Evento para notificar al GameManager cuando un enemigo cruza la meta
     public delegate void LlegadaFinal();
     public event LlegadaFinal OnLlegadaFinal;
 
@@ -31,9 +32,11 @@ public class Enemigo : MonoBehaviour
 
     protected virtual void Awake()
     {
+        // Inicialización de componentes y configuración física
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        // Usamos Kinematic para tener control total sobre la posición mediante código
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.simulated = true;
     }
@@ -43,35 +46,36 @@ public class Enemigo : MonoBehaviour
         ConfigurarDificultad();
     }
 
-    // --- NUEVA LÓGICA DE DIFICULTAD ---
+    // Ajusta las estadísticas del enemigo según el número de nivel extraído del nombre de la escena.
+    // Implementa un escalado lineal de dificultad.
     private void ConfigurarDificultad()
     {
         string nombreEscena = SceneManager.GetActiveScene().name;
+        // Verificamos si estamos en una escena de nivel para aplicar el escalado
         if (nombreEscena.StartsWith("Nivel"))
         {
             string numStr = nombreEscena.Replace("Nivel", "");
             if (int.TryParse(numStr, out int nivelActual))
             {
-                // Por cada nivel (empezando en el 1), sumamos 5 de vida.
-                // Nivel 1: +5, Nivel 2: +10, etc.
+                // Escalado: +5 de vida por cada nivel superado
                 int vidaExtra = nivelActual * 5;
                 vida += vidaExtra;
-                Debug.Log(gameObject.name + " aparece con " + vida + " de vida (Nivel " + nivelActual + ")");
             }
         }
     }
 
     void Update()
     {
+        // Optimizamos: No procesar movimiento si el juego está pausado o el enemigo ha muerto
         if (Mathf.Approximately(Time.timeScale, 0f)) return;
         if (listoParaMover && estaVivo) Mover();
     }
-
+    // Gestiona la resta de vida, feedback visual de daño y muerte.
     public void RecibirDanio(int cantidad)
     {
         if (!estaVivo) return;
         vida -= cantidad;
-        
+        // Feedback visual: Reiniciamos la corrutina si ya estaba parpadeando
         StopAllCoroutines(); 
         StartCoroutine(FeedbackDanio());
 
@@ -79,12 +83,13 @@ public class Enemigo : MonoBehaviour
 
         if (vida <= 0)
         {
+            // Entregar recompensa económica al jugador a través del Singleton del GameManager
             if (GameManager.instancia != null)
                 GameManager.instancia.GanarDinero(recompensa);
             Morir(true);
         }
     }
-
+    // Corrutina para dar feedback visual (parpadeo rojo) al recibir impactos.
     IEnumerator FeedbackDanio()
     {
         if (spriteRenderer != null)
@@ -94,7 +99,7 @@ public class Enemigo : MonoBehaviour
             spriteRenderer.color = Color.white;
         }
     }
-
+    // Inicializa la ruta de waypoints generada procedimentalmente
     public void SetWaypoints(List<Vector3> puntos)
     {
         if (puntos == null || puntos.Count < 2) return;
@@ -107,7 +112,8 @@ public class Enemigo : MonoBehaviour
         listoParaMover = true;
         if (animator != null) animator.SetBool("Caminando", true);
     }
-
+    // Lógica de desplazamiento hacia el siguiente waypoint.
+    // Incluye rotación del sprite (Flip) según la dirección.
     protected virtual void Mover()
     {
         // Si ya no devbe moverse o el indice es inválido. salimos
@@ -120,8 +126,8 @@ public class Enemigo : MonoBehaviour
         
         Vector2 direccion = objetivo2D - posicionActual2D;
         float distancia = direccion.magnitude;
-        // Si estamos muy cerca del punto actual, pasamos al siguiente
-        if (distancia < 0.25f)// Aumentamos un poco el margen de error
+        // Comprobamos si el enemigo ha alcanzado el waypoint actual
+        if (distancia < 0.25f)
         {
             indiceWaypoint++;
             // Si ya no hay más puntos, muere
@@ -133,36 +139,40 @@ public class Enemigo : MonoBehaviour
         }
         else
         {
-            // Mover hacia el objetivo
+            // Movimiento físico mediante Rigidbody2D para evitar traspasar colisiones si las hubiera
             float paso = velocidad * Time.deltaTime;
             rb.MovePosition(posicionActual2D + direccion.normalized * Mathf.Min(paso, distancia));
-            // Rotación opcional: Mirar hacia la dirección del movimiento
+            // Gestión del encaramiento (Flip) del sprite según la dirección en X
             if (direccion.x > 0.1f) transform.localScale = new Vector3(1, 1, 1);
             else if (direccion.x < -0.1f) transform.localScale = new Vector3(-1, 1, 1);
         }
     }
-
+    // Acción ejecutada cuando el enemigo logra atravesar las defensas.
     private void LlegarAlFinal()
     {
         if (!estaVivo) return;
         estaVivo = false;
         listoParaMover = false;
         rb.velocity = Vector2.zero;
+        // Desactivamos física y colisiones
         rb.isKinematic = true; 
         rb.simulated = false;
         if (col != null) col.enabled = false;
+        // Disparamos el evento de llegada para restar vidas al jugador
         if (OnLlegadaFinal != null) OnLlegadaFinal.Invoke();
         Morir(false);
     }
-
+    // Finaliza la existencia del objeto y notifica al sistema.
     public void Morir(bool muertoPorJugador)
     {
         estaVivo = false;
         listoParaMover = false;
         rb.simulated = false;
+        // Notificamos al GameManager para llevar el conteo de oleadas/enemigos restantes
         if (col != null) col.enabled = false;
         if (GameManager.instancia != null) GameManager.instancia.NotificarMuerteEnemigo();
         if (animator != null) { animator.SetBool("Caminando", false); animator.SetTrigger("Morir"); }
+        // En un proyecto mayor, aquí usaríamos un Object Pool en lugar de Destroy
         Destroy(gameObject);
     }
 }

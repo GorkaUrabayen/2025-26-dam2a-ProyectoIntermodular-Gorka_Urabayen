@@ -1,7 +1,9 @@
 using UnityEngine;
-
+// Gestiona el sistema de audio global del juego. 
+// Utiliza un patrón Singleton persistente para permitir que la música continúe sonando sin interrupciones durante las transiciones de escena.
 public class AudioManager : MonoBehaviour
 {
+    // Instancia estática para el acceso global (Patrón Singleton)
     public static AudioManager instancia;
 
     [Header("Configuración de Audio")]
@@ -15,21 +17,24 @@ public class AudioManager : MonoBehaviour
 
     void Awake()
     {
+        // Implementación del Singleton con persistencia entre escenas
         if (instancia == null)
         {
             instancia = this;
+            // Hace que este objeto no se destruya al cargar una nueva escena
             DontDestroyOnLoad(gameObject);
             
-            // Si no asignaste un AudioSource, intenta buscar uno en el objeto
+            // Autodetecta el AudioSource si no se asignó manualmente en el Inspector
             if (musicaSource == null) musicaSource = GetComponent<AudioSource>();
         }
         else
         {
+            // Si ya existe una instancia de AudioManager, destruimos la nueva para evitar duplicados
             Destroy(gameObject);
         }
     }
 
-    // --- Métodos que llama el GameManager ---
+    // --- Interfaz Pública para comunicación con el GameManager ---
 
     public void PlayMusicaMenu() => CambiarMusica(musicaMenu, true);
     
@@ -39,12 +44,14 @@ public class AudioManager : MonoBehaviour
     
     public void PlayMusicaDerrota() => CambiarMusica(musicaDerrota, false);
 
-    // Función interna para evitar repetir código
+    // Gestiona la transición lógica entre diferentes pistas de audio.
+    // Incluye una comprobación de seguridad para no reiniciar la pista si ya está sonando.
     private void CambiarMusica(AudioClip clip, bool loop)
     {
+        // Validación de nulidad para evitar errores en tiempo de ejecución
         if (musicaSource == null || clip == null) return;
 
-        // Si ya está sonando ese clip, no lo reinicies
+        // Optimización: Evita reiniciar la música si se llama al método y el clip ya es el actual
         if (musicaSource.clip == clip) return;
 
         musicaSource.Stop();
@@ -52,7 +59,8 @@ public class AudioManager : MonoBehaviour
         musicaSource.loop = loop;
         musicaSource.Play();
     }
-
+    // Permite ajustar el volumen de la música en tiempo real.
+    // Útil para la integración con sliders de volumen en el menú de opciones.
     public void ActualizarVolumen(float volumen)
     {
         if (musicaSource != null) musicaSource.volume = volumen;

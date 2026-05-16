@@ -13,7 +13,6 @@ public class ControladorDerrota : MonoBehaviour
 
     public void SalirDelJuego()
     {
-        Debug.Log("Cerrando el juego...");
         Application.Quit();
     }
 }

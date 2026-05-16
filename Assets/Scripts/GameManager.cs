@@ -3,9 +3,12 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine.UI;
-
+// Núcleo central del juego (GameBrain). 
+// Gestiona el estado global, la economía, el flujo de niveles, las transiciones
+// y la reconexión automática de la interfaz de usuario.
 public class GameManager : MonoBehaviour
 {
+    // Instancia estática para acceso global desde cualquier otro script
     public static GameManager instancia;
 
     [Header("Configuración de Progresión")]
@@ -32,25 +35,27 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        // Implementación del patrón Singleton con persistencia
+        // PATRÓN SINGLETON: Garantiza que solo exista un GameManager en todo el juego.
         if (instancia == null)
         {
             instancia = this;
+            // Persistencia: El objeto no se destruye al cargar nuevas escenas
             DontDestroyOnLoad(gameObject);
         }
         else
         {
+            // Si aparece un segundo GameManager (por ejemplo, al volver al menú), se elimina automáticamente
             Destroy(gameObject);
             return; // Importante para que no ejecute nada más si es un duplicado
         }
     }
-
+    // Suscripción a eventos del SceneManager para detectar cambios de escena
     void OnEnable() { SceneManager.sceneLoaded += AlCargarEscena; }
     void OnDisable() { SceneManager.sceneLoaded -= AlCargarEscena; }
 
     void Update()
     {
-        // Solo permitimos pausar si no estamos en menús o escenas finales
+        // Control de pausa mediante teclado (Barra Espaciadora)
         string escena = SceneManager.GetActiveScene().name;
         bool esEscenaDeJuego = escena != "EscenaInicio" && escena != "Derrota" && escena != "Victoria";
 
@@ -60,8 +65,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // --- SISTEMA DE NAVEGACIÓN CON TRANSICIONES ---
-    
+    // Wrapper para cargar escenas utilizando un sistema de transiciones (Fade u otros).    
     private void CargarEscenaConTransicion(string nombreEscena)
     {
         // Busca el script de transición en la escena actual
@@ -83,19 +87,21 @@ public class GameManager : MonoBehaviour
         if (panelPausa == null) ReconectarUI();
 
         juegoPausado = !juegoPausado;
+        // Manipulación de la escala de tiempo: 0 = Congelado, 1 = Tiempo real
         Time.timeScale = juegoPausado ? 0f : 1f;
 
         if (panelPausa != null) 
             panelPausa.SetActive(juegoPausado);
     }
-
+    // Se ejecuta automáticamente cada vez que se carga una escena nueva.
+    // Resetea estados, cambia la música y recalcula la economía del nivel.
     void AlCargarEscena(Scene escena, LoadSceneMode modo)
     {
         // Reset de estado básico
         Time.timeScale = 1f; 
         juegoPausado = false;
 
-        // Gestión de Audio (Si existe el AudioManager)
+        // Gestión centralizada de música según la escena actual
         if (AudioManager.instancia != null)
         {
             if (escena.name == "Derrota") AudioManager.instancia.PlayMusicaDerrota();
@@ -104,7 +110,7 @@ public class GameManager : MonoBehaviour
             else AudioManager.instancia.PlayMusicaNivel();
         }
 
-        // Configuración de stats según el nivel
+        // Lógica de progresión: Ajustamos el dinero inicial según el número de nivel
         if (escena.name.StartsWith("Nivel"))
         {
             string numeroString = escena.name.Replace("Nivel", "");
@@ -117,7 +123,8 @@ public class GameManager : MonoBehaviour
 
         enemigosRestantes = 0;
         
-        // Limpiamos referencias para forzar la búsqueda en la nueva escena
+        // Al cargar escena, las referencias de UI se pierden (son de la escena anterior).
+        // Las limpiamos y lanzamos la corrutina de reconexión.
         txtVidas = null;
         txtDinero = null;
         panelPausa = null; 
@@ -126,7 +133,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(BuscarUIPorPasos());
         ConfigurarCursor();
     }
-
+    // Corrutina para asegurar que la UI se encuentre incluso si tarda unos frames en instanciarse.
     IEnumerator BuscarUIPorPasos()
     {
         yield return new WaitForEndOfFrame();
@@ -134,12 +141,13 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         if (panelPausa == null) ReconectarUI();
     }
-
+    // Sistema de "Auto-Binding". Busca en la jerarquía los elementos de UI por nombre
+    // y les asigna los listeners a los botones dinámicamente.
     private void ReconectarUI()
     {
         if (instancia != this) return;
 
-        // 1. Buscar Textos (incluyendo desactivados)
+        // Búsqueda de objetos incluso si están desactivados (Resources.FindObjectsOfTypeAll)
         TMP_Text[] todosLosTextos = Resources.FindObjectsOfTypeAll<TMP_Text>();
         foreach (TMP_Text t in todosLosTextos)
         {
@@ -148,7 +156,7 @@ public class GameManager : MonoBehaviour
             if (t.gameObject.name == "TextoDinero") txtDinero = t;
         }
 
-        // 2. Buscar Panel Pausa y Botones
+        
         GameObject[] todosLosGos = Resources.FindObjectsOfTypeAll<GameObject>();
         foreach (GameObject go in todosLosGos)
         {
@@ -159,7 +167,7 @@ public class GameManager : MonoBehaviour
                 panelPausa = go;
                 panelPausa.SetActive(false);
             }
-
+            // Asignación dinámica de funciones a botones de la interfaz
             Button btn = go.GetComponent<Button>();
             if (btn != null)
             {
@@ -182,9 +190,11 @@ public class GameManager : MonoBehaviour
     public void NotificarMuerteEnemigo()
     {
         enemigosRestantes--;
+        // Si no quedan enemigos, esperamos un breve momento y pasamos de nivel
         if (enemigosRestantes <= 0) Invoke("GestionarCambioDeNivel", 2f);
     }
 
+    // Lógica de flujo de niveles. Detecta el nivel actual y calcula el siguiente.
     private void GestionarCambioDeNivel()
     {
         string nombreActual = SceneManager.GetActiveScene().name;
@@ -208,7 +218,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void GanarDinero(int cantidad) { dinero += cantidad; ActualizarUI(); }
-
+    // Valida si el jugador tiene suficiente dinero para realizar una compra.
     public bool GastarDinero(int cantidad)
     {
         if (dinero >= cantidad) { dinero -= cantidad; ActualizarUI(); return true; }

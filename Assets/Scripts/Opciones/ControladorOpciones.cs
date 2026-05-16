@@ -1,6 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+// Gestiona el menú de ajustes del juego.
+// Controla la persistencia de datos mediante PlayerPrefs y la sincronización
+// de la interfaz de usuario con los sistemas de audio y control.
 
+//¡El slider de sensibilidad se ara mas adelante!
 public class ControladorOpciones : MonoBehaviour
 {
     [Header("UI Sliders")]
@@ -13,49 +17,51 @@ public class ControladorOpciones : MonoBehaviour
 
     void Start()
     {
-        // 1. Cargar valores guardados (usamos 0.5f como valor por defecto si no hay nada guardado)
+        // 1. CARGA DE DATOS PERSISTENTES
+        // Recuperamos los valores guardados en el registro del sistema. 
+        // Si es la primera vez que se juega, se usan valores por defecto (0.5f y 1.0f).
         float vol = PlayerPrefs.GetFloat("VolumenMaster", 0.5f);
         float sens = PlayerPrefs.GetFloat("SensibilidadRaton", 1.0f);
 
-        // 2. Configurar Slider de Volumen
+        // 2. CONFIGURACIÓN DEL SLIDER DE VOLUMEN
         if (sliderVolumen != null)
         {
             sliderVolumen.value = vol;
             
-            // Aplicar el volumen guardado al AudioManager nada más empezar
+            // Sincronización inicial con el AudioManager al arrancar la escena
             if (AudioManager.instancia != null) 
                 AudioManager.instancia.ActualizarVolumen(vol);
             
-            // Escuchar cambios en el slider
+            // Suscripción mediante delegados al evento onValueChanged.
+            // Esto permite que el volumen cambie en tiempo real mientras el usuario arrastra el slider.
             sliderVolumen.onValueChanged.AddListener(delegate { SetVolumen(); });
         }
 
-        // 3. Configurar Slider de Sensibilidad
+        // 3. CONFIGURACIÓN DEL SLIDER DE SENSIBILIDAD
         if (sliderSensibilidad != null)
         {
             sliderSensibilidad.value = sens;
             sliderSensibilidad.onValueChanged.AddListener(delegate { SetSensibilidad(); });
         }
 
-        // 4. Asegurarse de que el panel empiece oculto
+        // 4. ESTADO INICIAL DE LA UI
+        // Garantizamos que el panel de opciones esté oculto al iniciar la partida.
         if (contenedorSlider != null) 
             contenedorSlider.SetActive(false);
     }
 
-    /// <summary>
-    /// Función principal para el botón de Opciones. 
-    /// Muestra u oculta el contenedor según su estado actual.
-    /// </summary>
+    // Alterna la visibilidad del panel de opciones.
+    // Método diseñado para ser llamado desde un botón de la interfaz (OnClick).
     public void AlternarSliderVolumen()
     {
         if (contenedorSlider != null)
         {
-            // El símbolo '!' invierte el estado: si es true pasa a false y viceversa
+            // Lógica de conmutación (Toggle): invierte el estado booleano actual.
             bool nuevoEstado = !contenedorSlider.activeSelf;
             contenedorSlider.SetActive(nuevoEstado);
         }
     }
-
+        // Actualiza y guarda el volumen maestro.
     public void SetVolumen()
     {
         if (sliderVolumen == null) return;
@@ -67,7 +73,7 @@ public class ControladorOpciones : MonoBehaviour
         if (AudioManager.instancia != null) 
             AudioManager.instancia.ActualizarVolumen(valor);
     }
-
+    // Actualiza y guarda la sensibilidad. (por ahora no funciona)
     public void SetSensibilidad()
     {
         if (sliderSensibilidad == null) return;

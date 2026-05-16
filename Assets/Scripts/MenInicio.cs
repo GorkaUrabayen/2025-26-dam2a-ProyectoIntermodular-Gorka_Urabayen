@@ -32,6 +32,5 @@ public class MenuInicio : MonoBehaviour
     public void Salir()
     {
         Application.Quit();
-        Debug.Log("Saliendo del juego...");
     }
 }

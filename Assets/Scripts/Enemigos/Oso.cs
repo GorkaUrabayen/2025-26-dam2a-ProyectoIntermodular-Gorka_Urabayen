@@ -1,3 +1,4 @@
+//Clase Oso que ereda de enemigo (el tanque)
 public class Oso : Enemigo 
 {
     protected override void Awake()

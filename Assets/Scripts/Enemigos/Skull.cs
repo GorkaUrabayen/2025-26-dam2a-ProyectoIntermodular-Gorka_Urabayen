@@ -1,3 +1,4 @@
+//Clase Skull que ereda de enemigo (el enemigo basico)
 public class Skull : Enemigo
 {
     protected override void Awake()
